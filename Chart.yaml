@@ -1,36 +1,20 @@
 apiVersion: v2
-name: gitea
-description: Gitea Helm chart for Kubernetes
+name: actions
+description: Gitea Actions chart for Kubernetes
 type: application
 version: 0.0.0
-# renovate datasource=github-releases depName=go-gitea/gitea extractVersion=^v(?<version>.*)$
-appVersion: 1.23.5
-icon: https://gitea.com/assets/img/logo.svg
+# renovate datasource=github-releases depName=go-gitea/act extractVersion=^v(?<version>.*)$
+appVersion: 0.261.3
 
 keywords:
-  - git
-  - issue tracker
-  - code review
-  - wiki
-  - gitea
-  - gogs
+  - cicd
+  - runner
+  - actions
 sources:
-  - https://gitea.com/gitea/helm-chart
-  - https://github.com/go-gitea/gitea
-  - https://hub.docker.com/r/gitea/gitea/
-maintainers:
-  - name: Charlie Drage
-    email: charlie@charliedrage.com
-  - name: Gitea Authors
-    email: maintainers@gitea.io
-  - name: Konrad Lother
-    email: konrad.lother@novum-rgi.de
-  - name: Lucas Hahn
-    email: lucas.hahn@novum-rgi.de
-  - name: Steven Kriegler
-    email: sk.bunsenbrenner@gmail.com
-  - name: Patrick Schratz
-    email: patrick.schratz@gmail.com
+  - https://gitea.com/gitea/helm-actions
+  - https://gitea.com/gitea/act
+# FIXME:
+# maintainers:
 
 dependencies:
   # https://github.com/bitnami/charts/blob/main/bitnami/postgresql
