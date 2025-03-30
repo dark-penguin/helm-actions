@@ -1,5 +1,5 @@
-{{- if .Values.actions.enabled }}
-{{- if and (and .Values.actions.provisioning.enabled .Values.persistence.enabled) .Values.persistence.mount }}
+{{- if .Values.enabled }}
+{{- if and (and .Values.provisioning.enabled .Values.persistence.enabled) .Values.persistence.mount }}
 {{- $name := include "gitea.workername" (dict "global" . "worker" "actions-token-job") }}
 {{- $secretName := include "gitea.workername" (dict "global" . "worker" "actions-token") }}
 ---
@@ -10,33 +10,33 @@ metadata:
   namespace: {{ .Values.namespace | default .Release.Namespace }}
   labels:
     {{- include "gitea.labels" . | nindent 4 }}
-    {{- with .Values.actions.provisioning.labels }}
+    {{- with .Values.provisioning.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
     app.kubernetes.io/component: token-job
   annotations:
-    {{- with .Values.actions.provisioning.annotations }}
+    {{- with .Values.provisioning.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
-  ttlSecondsAfterFinished: {{ .Values.actions.provisioning.ttlSecondsAfterFinished }}
+  ttlSecondsAfterFinished: {{ .Values.provisioning.ttlSecondsAfterFinished }}
   template:
     metadata:
       labels:
         {{- include "gitea.labels" . | nindent 8 }}
-        {{- with .Values.actions.provisioning.labels }}
+        {{- with .Values.provisioning.labels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
         app.kubernetes.io/component: token-job
     spec:
       initContainers:
         - name: init-gitea
-          image: "{{ .Values.actions.init.image.repository }}:{{ .Values.actions.init.image.tag }}"
+          image: "{{ .Values.init.image.repository }}:{{ .Values.init.image.tag }}"
           command:
             - sh
             - -c
             - |
-              while ! nc -z {{ include "gitea.fullname" . }}-http {{ .Values.service.http.port }}; do
+              while ! nc -z {{ include "gitea.act_runner.nc" . }}; do
                 sleep 5
               done
       containers:
@@ -54,7 +54,7 @@ spec:
               mkdir -p /data/actions/
               gitea actions generate-runner-token | grep -E '^.{40}$' | tr -d '\n' > /data/actions/token
           resources:
-            {{- toYaml .Values.actions.provisioning.resources | nindent 12 }}
+            {{- toYaml .Values.provisioning.resources | nindent 12 }}
           volumeMounts:
             - name: data
               mountPath: /data
@@ -62,8 +62,8 @@ spec:
               subPath: {{ .Values.persistence.subPath }}
               {{- end }}
         - name: actions-token-upload
-          image: "{{ .Values.actions.provisioning.publish.repository }}:{{ .Values.actions.provisioning.publish.tag }}"
-          imagePullPolicy: {{ .Values.actions.provisioning.publish.pullPolicy }}
+          image: "{{ .Values.provisioning.publish.repository }}:{{ .Values.provisioning.publish.tag }}"
+          imagePullPolicy: {{ .Values.provisioning.publish.pullPolicy }}
           env:
             - name: SECRET_NAME
               value: {{ $secretName }}
@@ -75,7 +75,7 @@ spec:
               kubectl auth can-i update secret/${SECRET_NAME}
               /scripts/token.sh
           resources:
-            {{- toYaml .Values.actions.provisioning.resources | nindent 12 }}
+            {{- toYaml .Values.provisioning.resources | nindent 12 }}
           volumeMounts:
             - mountPath: /scripts
               name: scripts
@@ -86,15 +86,15 @@ spec:
               {{- if .Values.persistence.subPath }}
               subPath: {{ .Values.persistence.subPath }}
               {{- end }}
-      {{- range $key, $value := .Values.actions.provisioning.nodeSelector }}
+      {{- range $key, $value := .Values.provisioning.nodeSelector }}
       nodeSelector:
         {{ $key }}: {{ $value | quote }}
       {{- end }}
-      {{- with .Values.actions.provisioning.affinity }}
+      {{- with .Values.provisioning.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.actions.provisioning.tolerations }}
+      {{- with .Values.provisioning.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}

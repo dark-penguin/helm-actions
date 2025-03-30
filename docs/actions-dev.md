@@ -26,9 +26,8 @@ In this case, you can use either the Web UI to generate the token or run a shell
 the command `gitea actions generate-runner-token`. After generating the token, you must create a secret and use it via:
 
 ```yaml
-actions:
-  provisioning:
-    enabled: false
-  existingSecret: "secret-name"
-  existingSecretKey: "secret-key"
+provisioning:
+  enabled: false
+existingSecret: "secret-name"
+existingSecretKey: "secret-key"
 ```

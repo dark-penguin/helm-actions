@@ -3,15 +3,14 @@ release:
   name: gitea-unittests
   namespace: testing
 templates:
-  - templates/gitea/act_runner/config-scripts.yaml
+  - templates/config-scripts.yaml
 tests:
   - it: renders a ConfigMap when all criteria are met
-    template: templates/gitea/act_runner/config-scripts.yaml
+    template: templates/config-scripts.yaml
     set:
-      actions:
+      enabled: true
+      provisioning:
         enabled: true
-        provisioning:
-          enabled: true
       persistence:
         enabled: true
         mount: true
@@ -21,26 +20,25 @@ tests:
       - containsDocument:
           kind: ConfigMap
           apiVersion: v1
-          name: gitea-unittests-scripts
+          name: gitea-unittests-actions-scripts
       - isNotNullOrEmpty:
           path: data["token.sh"]
   - it: doesn't renders a ConfigMap by default
-    template: templates/gitea/act_runner/config-scripts.yaml
+    template: templates/config-scripts.yaml
     asserts:
       - hasDocuments:
           count: 0
   - it: doesn't renders a ConfigMap with disabled actions but enabled provisioning
-    template: templates/gitea/act_runner/config-scripts.yaml
+    template: templates/config-scripts.yaml
     asserts:
       - hasDocuments:
           count: 0
   - it: doesn't renders a ConfigMap with disabled actions but otherwise met criteria
-    template: templates/gitea/act_runner/config-scripts.yaml
+    template: templates/config-scripts.yaml
     set:
-      actions:
-        enabled: false
-        provisioning:
-          enabled: true
+      enabled: false
+      provisioning:
+        enabled: true
       persistence:
         enabled: true
         mount: true

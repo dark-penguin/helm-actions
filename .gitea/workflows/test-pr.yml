@@ -21,6 +21,10 @@ jobs:
         run: |
           apk update
           apk add --update bash make nodejs npm yamllint ncurses
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
       - uses: actions/checkout@v4
       - name: install chart dependencies
         run: helm dependency build
@@ -36,7 +40,7 @@ jobs:
         env:
           TERM: xterm
         run: |
-          make unittests
+          make unittests-helm
       - name: verify readme
         run: |
           make readme
