@@ -16,4 +16,7 @@ unittests-helm:
 .PHONY: helm
 update-helm-dependencies:
 	helm dependency update
-  
+
+.PHONY: yamllint
+yamllint:
+	yamllint -c .yamllint .

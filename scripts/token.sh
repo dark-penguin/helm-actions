@@ -8,9 +8,14 @@ check_token() {
   set +e
 
   echo "Checking for existing token..."
-  token="$(kubectl get secret "$SECRET_NAME" -o jsonpath="{.data['token']}" 2> /dev/null)"
-  [ $? -ne 0 ] && return 1
-  [ -z "$token" ] && return 2
+  if ! token=$(kubectl get secret "${SECRET_NAME}" -o jsonpath="{.data['token']}" 2> /dev/null); then
+    return 1
+  fi
+
+  if [ -z "${token}" ]; then
+    return 2
+  fi
+
   return 0
 }
 
