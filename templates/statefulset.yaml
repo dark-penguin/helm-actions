@@ -125,5 +125,5 @@ spec:
         {{- include "gitea.persistence.storageClass" . | nindent 8 }}
         resources:
           requests:
-            storage: 1Mi
+            storage: {{ .Values.statefulset.persistence.size }}
 {{- end }}
