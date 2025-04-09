@@ -1,11 +1,11 @@
 {{- if .Values.enabled }}
-{{- $secretName := include "gitea.workername" (dict "global" . "worker" "actions-token") }}
+{{- $secretName := include "gitea.actions.workername" (dict "global" . "worker" "actions-token") }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   labels:
-    {{- include "gitea.labels.actRunner" . | nindent 4 }}
+    {{- include "gitea.actions.labels.actRunner" . | nindent 4 }}
     {{- with .Values.statefulset.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -13,18 +13,18 @@ metadata:
     {{- with .Values.statefulset.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-  name: {{ include "gitea.fullname" . }}-act-runner
+  name: {{ include "gitea.actions.fullname" . }}-act-runner
   namespace: {{ .Values.namespace | default .Release.Namespace }}
 spec:
   selector:
     matchLabels:
-      {{- include "gitea.selectorLabels.actRunner" . | nindent 6 }}
+      {{- include "gitea.actions.selectorLabels.actRunner" . | nindent 6 }}
   template:
     metadata:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/config-act-runner.yaml") . | sha256sum }}
       labels:
-        {{- include "gitea.labels.actRunner" . | nindent 8 }}
+        {{- include "gitea.actions.labels.actRunner" . | nindent 8 }}
         {{- with .Values.statefulset.labels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -36,7 +36,7 @@ spec:
             - sh
             - -c
             - |
-              while ! nc -z {{ include "gitea.act_runner.nc" . }}; do
+              while ! nc -z {{ include "gitea.actions.nc" . }}; do
                 sleep 5
               done
       containers:
@@ -57,7 +57,7 @@ spec:
                   name: "{{ .Values.existingSecret | default $secretName }}"
                   key: "{{ .Values.existingSecretKey | default "token" }}"
             - name: GITEA_INSTANCE_URL
-              value: {{ include "gitea.act_runner.local_root_url" . }}
+              value: {{ include "gitea.actions.local_root_url" . }}
             - name: CONFIG_FILE
               value: /actrunner/config.yaml
           resources:
@@ -111,7 +111,7 @@ spec:
       volumes:
         - name: act-runner-config
           configMap:
-            name: {{ include "gitea.fullname" . }}-act-runner-config
+            name: {{ include "gitea.actions.fullname" . }}-act-runner-config
         - name: docker-certs
           emptyDir: {}
         {{- with .Values.statefulset.extraVolumes }}
@@ -122,7 +122,7 @@ spec:
         name: data-act-runner
       spec:
         accessModes: [ "ReadWriteOnce" ]
-        {{- include "gitea.persistence.storageClass" . | nindent 8 }}
+        {{- include "gitea.actions.persistence.storageClass" . | nindent 8 }}
         resources:
           requests:
             storage: {{ .Values.statefulset.persistence.size }}

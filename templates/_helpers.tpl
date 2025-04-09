@@ -3,7 +3,7 @@
 Expand the name of the chart.
 */}}
 
-{{- define "gitea.name" -}}
+{{- define "gitea.actions.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
@@ -12,7 +12,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "gitea.fullname" -}}
+{{- define "gitea.actions.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -28,21 +28,21 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create a default worker name.
 */}}
-{{- define "gitea.workername" -}}
+{{- define "gitea.actions.workername" -}}
 {{- printf "%s-%s" .global.Release.Name .worker | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "gitea.chart" -}}
+{{- define "gitea.actions.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
 Create image name and tag used by the deployment.
 */}}
-{{- define "gitea.image" -}}
+{{- define "gitea.actions.image" -}}
 {{- $fullOverride := .Values.image.fullOverride | default "" -}}
 {{- $registry := .Values.global.imageRegistry | default .Values.image.registry -}}
 {{- $repository := .Values.image.repository -}}
@@ -65,7 +65,7 @@ Create image name and tag used by the deployment.
 {{/*
 Storage Class
 */}}
-{{- define "gitea.persistence.storageClass" -}}
+{{- define "gitea.actions.persistence.storageClass" -}}
 {{- $storageClass :=  (tpl ( default "" .Values.persistence.storageClass) .) | default (tpl ( default "" .Values.global.storageClass) .) }}
 {{- if $storageClass }}
 storageClassName: {{ $storageClass | quote }}
@@ -75,19 +75,19 @@ storageClassName: {{ $storageClass | quote }}
 {{/*
 Common labels
 */}}
-{{- define "gitea.labels" -}}
-helm.sh/chart: {{ include "gitea.chart" . }}
-app: {{ include "gitea.name" . }}
-{{ include "gitea.selectorLabels" . }}
+{{- define "gitea.actions.labels" -}}
+helm.sh/chart: {{ include "gitea.actions.chart" . }}
+app: {{ include "gitea.actions.name" . }}
+{{ include "gitea.actions.selectorLabels" . }}
 app.kubernetes.io/version: {{ .Values.image.tag | default .Chart.AppVersion | quote }}
 version: {{ .Values.image.tag | default .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
-{{- define "gitea.labels.actRunner" -}}
-helm.sh/chart: {{ include "gitea.chart" . }}
-app: {{ include "gitea.name" . }}-act-runner
-{{ include "gitea.selectorLabels.actRunner" . }}
+{{- define "gitea.actions.labels.actRunner" -}}
+helm.sh/chart: {{ include "gitea.actions.chart" . }}
+app: {{ include "gitea.actions.name" . }}-act-runner
+{{ include "gitea.actions.selectorLabels.actRunner" . }}
 app.kubernetes.io/version: {{ .Values.image.tag | default .Chart.AppVersion | quote }}
 version: {{ .Values.image.tag | default .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
@@ -96,25 +96,25 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "gitea.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "gitea.name" . }}
+{{- define "gitea.actions.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "gitea.actions.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
-{{- define "gitea.selectorLabels.actRunner" -}}
-app.kubernetes.io/name: {{ include "gitea.name" . }}-act-runner
+{{- define "gitea.actions.selectorLabels.actRunner" -}}
+app.kubernetes.io/name: {{ include "gitea.actions.name" . }}-act-runner
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
-{{- define "gitea.act_runner.local_root_url" -}}
+{{- define "gitea.actions.local_root_url" -}}
   {{- .Values.giteaRootURL -}}
 {{- end -}}
 
 {{/*
 Parse the http url to hostname + port separated by space for the nc command
 */}}
-{{- define "gitea.act_runner.nc" -}}
-{{- $url := include "gitea.act_runner.local_root_url" . | urlParse -}}
+{{- define "gitea.actions.nc" -}}
+{{- $url := include "gitea.actions.local_root_url" . | urlParse -}}
 {{- $host := get $url "host" -}}
 {{- $scheme := get $url "scheme" -}}
 {{- $port := "80" -}}

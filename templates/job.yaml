@@ -1,7 +1,7 @@
 {{- if .Values.enabled }}
 {{- if and (and .Values.provisioning.enabled .Values.persistence.enabled) .Values.persistence.mount }}
-{{- $name := include "gitea.workername" (dict "global" . "worker" "actions-token-job") }}
-{{- $secretName := include "gitea.workername" (dict "global" . "worker" "actions-token") }}
+{{- $name := include "gitea.actions.workername" (dict "global" . "worker" "actions-token-job") }}
+{{- $secretName := include "gitea.actions.workername" (dict "global" . "worker" "actions-token") }}
 ---
 apiVersion: batch/v1
 kind: Job
@@ -9,7 +9,7 @@ metadata:
   name: {{ $name }}
   namespace: {{ .Values.namespace | default .Release.Namespace }}
   labels:
-    {{- include "gitea.labels" . | nindent 4 }}
+    {{- include "gitea.actions.labels" . | nindent 4 }}
     {{- with .Values.provisioning.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -23,7 +23,7 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "gitea.labels" . | nindent 8 }}
+        {{- include "gitea.actions.labels" . | nindent 8 }}
         {{- with .Values.provisioning.labels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -36,12 +36,12 @@ spec:
             - sh
             - -c
             - |
-              while ! nc -z {{ include "gitea.act_runner.nc" . }}; do
+              while ! nc -z {{ include "gitea.actions.nc" . }}; do
                 sleep 5
               done
       containers:
         - name: actions-token-create
-          image: "{{ include "gitea.image" . }}"
+          image: "{{ include "gitea.actions.image" . }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: GITEA_APP_INI
@@ -103,7 +103,7 @@ spec:
       volumes:
         - name: scripts
           configMap:
-            name: {{ include "gitea.fullname" . }}-scripts
+            name: {{ include "gitea.actions.fullname" . }}-scripts
             defaultMode: 0755
         - name: data
           persistentVolumeClaim:
