@@ -69,7 +69,7 @@ tests:
           name: gitea-unittests-actions-act-runner
       - equal:
           path: spec.template.metadata.annotations["checksum/config"]
-          value: "e01f6cc186c5b523cba245cbfc9d556df49a71f7f650c979c2dbfd2bf40b9098"
+          value: "7566d9c60261bf8cbff6a6936fc7aead96cec540d8c793d142a5ad4664c56ba5"
   - it: renders a StatefulSet http (with correct GITEA_INSTANCE_URL env from giteaRootURL)
     template: templates/statefulset.yaml
     set:

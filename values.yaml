@@ -1,5 +1,4 @@
 # Configure Gitea Actions
-# - must enable persistence if the job is enabled
 ## @section Gitea Actions
 #
 ## @param enabled Create an act runner StatefulSet.
@@ -24,17 +23,6 @@
 ## @param statefulset.dind.extraVolumeMounts Allows mounting extra volumes in the Docker-in-Docker container
 ## @param statefulset.dind.extraEnvs Allows adding custom environment variables, such as `DOCKER_IPTABLES_LEGACY`
 ## @param statefulset.persistence.size Size for persistence to store act runner data
-## @param provisioning.enabled Create a job that will create and save the token in a Kubernetes Secret
-## @param provisioning.annotations Job's annotations
-## @param provisioning.labels Job's labels
-## @param provisioning.resources Job's resources
-## @param provisioning.nodeSelector NodeSelector for the job
-## @param provisioning.tolerations Tolerations for the job
-## @param provisioning.affinity Affinity for the job
-## @param provisioning.ttlSecondsAfterFinished ttl for the job after finished in order to allow helm to properly recognize that the job completed
-## @param provisioning.publish.repository The image that can create the secret via kubectl
-## @param provisioning.publish.tag The publish image tag that can create the secret
-## @param provisioning.publish.pullPolicy The publish image pullPolicy that can create the secret
 ## @param existingSecret Secret that contains the token
 ## @param existingSecretKey Secret key
 ## @param giteaRootURL URL the act_runner registers and connect with
@@ -84,23 +72,6 @@ init:
     # Overrides the image tag whose default is the chart appVersion.
     tag: "1.37.0"
 
-provisioning:
-  enabled: false
-
-  annotations: {}
-  labels: {}
-  resources: {}
-  nodeSelector: {}
-  tolerations: []
-  affinity: {}
-
-  publish:
-    repository: bitnami/kubectl
-    tag: 1.29.0
-    pullPolicy: IfNotPresent
-
-  ttlSecondsAfterFinished: 300
-
 ## Specify an existing token secret
 ##
 existingSecret: ""
@@ -108,52 +79,6 @@ existingSecretKey: ""
 
 ## Specify the root URL of the Gitea instance
 giteaRootURL: ""
-
-## @section Persistence
-#
-## @param persistence.enabled Enable persistent storage
-## @param persistence.create Whether to create the persistentVolumeClaim for shared storage
-## @param persistence.mount Whether the persistentVolumeClaim should be mounted (even if not created)
-## @param persistence.claimName Use an existing claim to store repository information
-## @param persistence.size Size for persistence to store repo information
-## @param persistence.accessModes AccessMode for persistence
-## @param persistence.labels Labels for the persistence volume claim to be created
-## @param persistence.annotations.helm.sh/resource-policy Resource policy for the persistence volume claim
-## @param persistence.storageClass Name of the storage class to use
-## @param persistence.subPath Subdirectory of the volume to mount at
-## @param persistence.volumeName Name of persistent volume in PVC
-persistence:
-  enabled: true
-  create: true
-  mount: true
-  claimName: gitea-shared-storage
-  size: 10Gi
-  accessModes:
-    - ReadWriteOnce
-  labels: {}
-  storageClass:
-  subPath:
-  volumeName: ""
-  annotations:
-    helm.sh/resource-policy: keep
-
-## @section Image
-## @param image.registry image registry, e.g. gcr.io,docker.io
-## @param image.repository Image to start for this pod
-## @param image.tag Visit: [Image tag](https://hub.docker.com/r/gitea/gitea/tags?page=1&ordering=last_updated). Defaults to `appVersion` within Chart.yaml.
-## @param image.digest Image digest. Allows to pin the given image tag. Useful for having control over mutable tags like `latest`
-## @param image.pullPolicy Image pull policy
-## @param image.rootless Wether or not to pull the rootless version of Gitea, only works on Gitea 1.14.x or higher
-## @param image.fullOverride Completely overrides the image registry, path/image, tag and digest. **Adjust `image.rootless` accordingly and review [Rootless defaults](#rootless-defaults).**
-image:
-  registry: "docker.gitea.com"
-  repository: gitea
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
-  digest: ""
-  pullPolicy: IfNotPresent
-  rootless: true
-  fullOverride: ""
 
 ## @section Global
 #

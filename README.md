@@ -34,48 +34,9 @@ If `.Values.image.rootless: true`, then the following will occur. In case you us
 | `statefulset.dind.extraVolumeMounts`      | Allows mounting extra volumes in the Docker-in-Docker container                                                                             | `[]`                           |
 | `statefulset.dind.extraEnvs`              | Allows adding custom environment variables, such as `DOCKER_IPTABLES_LEGACY`                                                                | `[]`                           |
 | `statefulset.persistence.size`            | Size for persistence to store act runner data                                                                                               | `1Gi`                          |
-| `provisioning.enabled`                    | Create a job that will create and save the token in a Kubernetes Secret                                                                     | `false`                        |
-| `provisioning.annotations`                | Job's annotations                                                                                                                           | `{}`                           |
-| `provisioning.labels`                     | Job's labels                                                                                                                                | `{}`                           |
-| `provisioning.resources`                  | Job's resources                                                                                                                             | `{}`                           |
-| `provisioning.nodeSelector`               | NodeSelector for the job                                                                                                                    | `{}`                           |
-| `provisioning.tolerations`                | Tolerations for the job                                                                                                                     | `[]`                           |
-| `provisioning.affinity`                   | Affinity for the job                                                                                                                        | `{}`                           |
-| `provisioning.ttlSecondsAfterFinished`    | ttl for the job after finished in order to allow helm to properly recognize that the job completed                                          | `300`                          |
-| `provisioning.publish.repository`         | The image that can create the secret via kubectl                                                                                            | `bitnami/kubectl`              |
-| `provisioning.publish.tag`                | The publish image tag that can create the secret                                                                                            | `1.29.0`                       |
-| `provisioning.publish.pullPolicy`         | The publish image pullPolicy that can create the secret                                                                                     | `IfNotPresent`                 |
 | `existingSecret`                          | Secret that contains the token                                                                                                              | `""`                           |
 | `existingSecretKey`                       | Secret key                                                                                                                                  | `""`                           |
 | `giteaRootURL`                            | URL the act_runner registers and connect with                                                                                               | `""`                           |
-
-### Persistence
-
-| Name                                              | Description                                                               | Value                  |
-| ------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------- |
-| `persistence.enabled`                             | Enable persistent storage                                                 | `true`                 |
-| `persistence.create`                              | Whether to create the persistentVolumeClaim for shared storage            | `true`                 |
-| `persistence.mount`                               | Whether the persistentVolumeClaim should be mounted (even if not created) | `true`                 |
-| `persistence.claimName`                           | Use an existing claim to store repository information                     | `gitea-shared-storage` |
-| `persistence.size`                                | Size for persistence to store repo information                            | `10Gi`                 |
-| `persistence.accessModes`                         | AccessMode for persistence                                                | `["ReadWriteOnce"]`    |
-| `persistence.labels`                              | Labels for the persistence volume claim to be created                     | `{}`                   |
-| `persistence.annotations.helm.sh/resource-policy` | Resource policy for the persistence volume claim                          | `keep`                 |
-| `persistence.storageClass`                        | Name of the storage class to use                                          | `nil`                  |
-| `persistence.subPath`                             | Subdirectory of the volume to mount at                                    | `nil`                  |
-| `persistence.volumeName`                          | Name of persistent volume in PVC                                          | `""`                   |
-
-### Image
-
-| Name                 | Description                                                                                                                                                      | Value              |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
-| `image.registry`     | image registry, e.g. gcr.io,docker.io                                                                                                                            | `docker.gitea.com` |
-| `image.repository`   | Image to start for this pod                                                                                                                                      | `gitea`            |
-| `image.tag`          | Visit: [Image tag](https://hub.docker.com/r/gitea/gitea/tags?page=1&ordering=last_updated). Defaults to `appVersion` within Chart.yaml.                          | `""`               |
-| `image.digest`       | Image digest. Allows to pin the given image tag. Useful for having control over mutable tags like `latest`                                                       | `""`               |
-| `image.pullPolicy`   | Image pull policy                                                                                                                                                | `IfNotPresent`     |
-| `image.rootless`     | Wether or not to pull the rootless version of Gitea, only works on Gitea 1.14.x or higher                                                                        | `true`             |
-| `image.fullOverride` | Completely overrides the image registry, path/image, tag and digest. **Adjust `image.rootless` accordingly and review [Rootless defaults](#rootless-defaults).** | `""`               |
 
 ### Global
 
