@@ -86,23 +86,3 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- define "gitea.actions.local_root_url" -}}
   {{- .Values.giteaRootURL -}}
 {{- end -}}
-
-{{/*
-Parse the http url to hostname + port separated by space for the nc command
-*/}}
-{{- define "gitea.actions.nc" -}}
-{{- $url := include "gitea.actions.local_root_url" . | urlParse -}}
-{{- $host := get $url "host" -}}
-{{- $scheme := get $url "scheme" -}}
-{{- $port := "80" -}}
-{{- if contains ":" $host -}}
-    {{- $hostAndPort := regexSplit ":" $host 2 -}}
-    {{- $host = index $hostAndPort 0 -}}
-    {{- $port = index $hostAndPort 1 -}}
-{{- else if eq $scheme "https" -}}
-    {{- $port = "443" -}}
-{{- else if eq $scheme "http" -}}
-    {{- $port = "80" -}}
-{{- end -}}
-{{- printf "%s %s" $host $port -}}
-{{- end -}}

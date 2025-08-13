@@ -37,9 +37,12 @@ spec:
             - sh
             - -c
             - |
-              while ! nc -z {{ include "gitea.actions.nc" . }}; do
-                sleep 5
+              echo 'Trying to reach Gitea on {{ include "gitea.actions.local_root_url" . }}'
+              while ! wget --no-check-certificate -qO- {{ include "gitea.actions.local_root_url" . }}; do
+                sleep 3
+                echo "Trying again in 3 seconds..."
               done
+              echo "Gitea has been reached!"
       containers:
         - name: act-runner
           image: "{{ .Values.statefulset.actRunner.repository }}:{{ .Values.statefulset.actRunner.tag }}"

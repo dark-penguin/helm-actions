@@ -92,9 +92,12 @@ tests:
       - equal:
           path: spec.template.spec.initContainers[0].command[2]
           value: |
-            while ! nc -z git.example.com 80; do
-              sleep 5
+            echo 'Trying to reach Gitea on http://git.example.com'
+            while ! wget --no-check-certificate -qO- http://git.example.com; do
+              sleep 3
+              echo "Trying again in 3 seconds..."
             done
+            echo "Gitea has been reached!"
   - it: renders a StatefulSet https (with correct GITEA_INSTANCE_URL env from giteaRootURL)
     template: templates/statefulset.yaml
     set:
@@ -117,9 +120,12 @@ tests:
       - equal:
           path: spec.template.spec.initContainers[0].command[2]
           value: |
-            while ! nc -z git.example.com 443; do
-              sleep 5
+            echo 'Trying to reach Gitea on https://git.example.com'
+            while ! wget --no-check-certificate -qO- https://git.example.com; do
+              sleep 3
+              echo "Trying again in 3 seconds..."
             done
+            echo "Gitea has been reached!"
   - it: renders a StatefulSet https (with correct GITEA_INSTANCE_URL env from giteaRootURL)
     template: templates/statefulset.yaml
     set:
@@ -142,9 +148,12 @@ tests:
       - equal:
           path: spec.template.spec.initContainers[0].command[2]
           value: |
-            while ! nc -z git.example.com 8443; do
-              sleep 5
+            echo 'Trying to reach Gitea on https://git.example.com:8443'
+            while ! wget --no-check-certificate -qO- https://git.example.com:8443; do
+              sleep 3
+              echo "Trying again in 3 seconds..."
             done
+            echo "Gitea has been reached!"
   - it: allows adding custom environment variables to the docker-in-docker container
     template: templates/statefulset.yaml
     set:
