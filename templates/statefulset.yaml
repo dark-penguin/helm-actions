@@ -38,7 +38,7 @@ spec:
             - -c
             - |
               echo 'Trying to reach Gitea on {{ include "gitea.actions.local_root_url" . }}'
-              while ! wget --no-check-certificate -qO- {{ include "gitea.actions.local_root_url" . }}; do
+              until timeout 10 wget --no-check-certificate --spider {{ include "gitea.actions.local_root_url" . }}; do
                 sleep 3
                 echo "Trying again in 3 seconds..."
               done

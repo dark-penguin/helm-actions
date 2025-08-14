@@ -93,7 +93,7 @@ tests:
           path: spec.template.spec.initContainers[0].command[2]
           value: |
             echo 'Trying to reach Gitea on http://git.example.com'
-            while ! wget --no-check-certificate -qO- http://git.example.com; do
+            until timeout 10 wget --no-check-certificate --spider http://git.example.com; do
               sleep 3
               echo "Trying again in 3 seconds..."
             done
@@ -121,7 +121,7 @@ tests:
           path: spec.template.spec.initContainers[0].command[2]
           value: |
             echo 'Trying to reach Gitea on https://git.example.com'
-            while ! wget --no-check-certificate -qO- https://git.example.com; do
+            until timeout 10 wget --no-check-certificate --spider https://git.example.com; do
               sleep 3
               echo "Trying again in 3 seconds..."
             done
@@ -149,7 +149,7 @@ tests:
           path: spec.template.spec.initContainers[0].command[2]
           value: |
             echo 'Trying to reach Gitea on https://git.example.com:8443'
-            while ! wget --no-check-certificate -qO- https://git.example.com:8443; do
+            until timeout 10 wget --no-check-certificate --spider https://git.example.com:8443; do
               sleep 3
               echo "Trying again in 3 seconds..."
             done
