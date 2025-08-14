@@ -1,4 +1,10 @@
-# helm-act
+# Gitea Actions Helm Chart
+
+This helm chart serves as the way to deploy the Gitea [act-runners](https://gitea.com/gitea/act_runner) alongside a runner Gitea instance.  
+It serves as a standalone chart and does not rely on Gitea to be present in the same environment, however it needs to be able to reach a Gitea instance to function.  
+The parameters which can be used to customize the deployment are described below, check those out if you want to see if something is supported.  
+
+If you want to propose a new feature or mechanism, submit an [issue here](https://gitea.com/gitea/helm-actions/issues).
 
 ## Rootless Defaults
 
