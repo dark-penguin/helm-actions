@@ -14,6 +14,10 @@ sources:
   - https://gitea.com/gitea/helm-actions
   - https://gitea.com/gitea/act
 # FIXME:
-# maintainers:
+
+maintainers:
+  # https://gitea.com/DaanSelen
+  - name: Daan Selen
+    email: dselen@nerthus.nl
 
 dependencies: []
