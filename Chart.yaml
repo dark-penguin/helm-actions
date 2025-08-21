@@ -13,11 +13,14 @@ keywords:
 sources:
   - https://gitea.com/gitea/helm-actions
   - https://gitea.com/gitea/act
-# FIXME:
 
 maintainers:
   # https://gitea.com/DaanSelen
   - name: Daan Selen
     email: dselen@nerthus.nl
+
+  # https://gitea.com/ChristopherHX
+  - name: Christopher Homberger
+    email: christopher.homberger@web.de
 
 dependencies: []
