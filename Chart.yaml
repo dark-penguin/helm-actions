@@ -19,6 +19,10 @@ maintainers:
   - name: Daan Selen
     email: dselen@nerthus.nl
 
+  # https://gitea.com/volker.raschek
+  - name: Markus Pesch
+    email: markus.pesch+apps@cryptic.systems
+
   # https://gitea.com/ChristopherHX
   - name: Christopher Homberger
     email: christopher.homberger@web.de
