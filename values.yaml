@@ -39,7 +39,7 @@ statefulset:
 
   actRunner:
     repository: gitea/act_runner
-    tag: 0.2.11
+    tag: 0.2.12
     pullPolicy: IfNotPresent
     extraVolumeMounts: []
 
@@ -52,7 +52,7 @@ statefulset:
 
   dind:
     repository: docker
-    tag: 25.0.2-dind
+    tag: 28.3.3-dind
     pullPolicy: IfNotPresent
     extraVolumeMounts: []
 
