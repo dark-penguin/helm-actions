@@ -6,6 +6,10 @@ The parameters which can be used to customize the deployment are described below
 
 If you want to propose a new feature or mechanism, submit an [issue here](https://gitea.com/gitea/helm-actions/issues).
 
+## Docs
+
+[Docs](./docs/README.md)
+
 ## Rootless Defaults
 
 If `.Values.image.rootless: true`, then the following will occur. In case you use `.Values.image.fullOverride`, check that this works in your image:
