@@ -39,7 +39,7 @@ statefulset:
 
   actRunner:
     repository: gitea/act_runner
-    tag: 0.2.12
+    tag: 0.2.13
     pullPolicy: IfNotPresent
     extraVolumeMounts: []
 
@@ -49,6 +49,9 @@ statefulset:
         level: debug
       cache:
         enabled: false
+      container:
+        require_docker: true
+        docker_timeout: 300s
 
   dind:
     repository: docker

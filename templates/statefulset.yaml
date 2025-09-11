@@ -48,20 +48,6 @@ spec:
           image: "{{ .Values.statefulset.actRunner.repository }}:{{ .Values.statefulset.actRunner.tag }}"
           imagePullPolicy: {{ .Values.statefulset.actRunner.pullPolicy }}
           workingDir: /data
-          command:
-          # The following is a workaround for: https://gitea.com/gitea/act_runner/issues/731
-          # We must add the docker-cli package for the server AND client cert verification.
-            - sh
-            - -c
-            - |
-              apk add --no-cache docker-cli
-              echo "Waiting for Docker daemon..."
-              until timeout 10 docker info > /dev/null; do
-                echo "Failed, retrying..."
-                sleep 2
-              done
-              echo "Docker is ready, starting act-runner..."
-              exec run.sh
           env:
             - name: DOCKER_HOST
               value: tcp://127.0.0.1:2376
