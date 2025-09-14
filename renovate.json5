@@ -39,11 +39,30 @@
       datasourceTemplate: 'github-releases',
     },
   ],
+  lockFileMaintenance: {
+    "enabled": true,
+    "commitMessageAction": "update",
+    "commitMessageTopic": "lockfiles",
+    schedule: [
+      'at any time',
+    ]
+  },
   packageRules: [
     {
       groupName: 'subcharts (minor & patch)',
       matchManagers: [
         'helmv3',
+      ],
+      matchUpdateTypes: [
+        'minor',
+        'patch',
+        'digest',
+      ],
+    },
+    {
+      groupName: 'bats testing framework',
+      matchManagers: [
+        'git-submodules',
       ],
       matchUpdateTypes: [
         'minor',
