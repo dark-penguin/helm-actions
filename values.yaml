@@ -5,6 +5,7 @@
 ## @param init.image.repository The image used for the init containers
 ## @param init.image.tag The image tag used for the init containers
 ## @param statefulset.replicas the amount of (replica) runner pods deployed
+## @param statefulset.timezone is the timezone that will be set in the act_runner image
 ## @param statefulset.annotations Act runner annotations
 ## @param statefulset.labels Act runner labels
 ## @param statefulset.resources Act runner resources
@@ -29,6 +30,7 @@
 enabled: false
 statefulset:
   replicas: 1
+  timezone: Etc/UTC
   annotations: {}
   labels: {}
   resources: {}

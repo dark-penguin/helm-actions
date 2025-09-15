@@ -64,6 +64,8 @@ spec:
               value: {{ include "gitea.actions.local_root_url" . }}
             - name: CONFIG_FILE
               value: /actrunner/config.yaml
+            - name: TZ
+              value: {{ .Values.statefulset.timezone | default "Etc/UTC" }}
           resources:
             {{- toYaml .Values.statefulset.resources | nindent 12 }}
           volumeMounts:
