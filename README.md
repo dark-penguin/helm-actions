@@ -16,6 +16,29 @@ If `.Values.image.rootless: true`, then the following will occur. In case you us
 
 - If `.Values.provisioning.enabled: true`, then uses the rootless Gitea image, must match helm-Gitea.
 
+## Quick-start
+
+To get started, add the Helm repo, assuming you have not already:
+
+```sh
+helm repo add gitea-charts https://dl.gitea.com/charts/
+helm repo update
+```
+
+Then pull the values.yaml file and fill it accordingly.
+
+```sh
+helm show values gitea-charts/actions > values.yaml
+```
+
+Deploy with your values, make sure the path is correct:
+
+```sh
+helm upgrade --install gitea-actions gitea-charts/actions -f values.yaml
+```
+
+You should be good to go!
+
 ## Parameters
 
 ### Gitea Actions
