@@ -13,13 +13,19 @@
 ## @param statefulset.tolerations Tolerations for the statefulset
 ## @param statefulset.affinity Affinity for the statefulset
 ## @param statefulset.extraVolumes Extra volumes for the statefulset
+## @param statefulset.actRunner.registry image registry, e.g. gcr.io,docker.io
 ## @param statefulset.actRunner.repository The Gitea act runner image
 ## @param statefulset.actRunner.tag The Gitea act runner tag
+## @param statefulset.actRunner.digest Image digest. Allows to pin the given image tag. Useful for having control over mutable tags like `latest`
 ## @param statefulset.actRunner.pullPolicy The Gitea act runner pullPolicy
+## @param statefulset.actRunner.fullOverride Completely overrides the image registry, path/image, tag and digest.
 ## @param statefulset.actRunner.extraVolumeMounts Allows mounting extra volumes in the act runner container
 ## @param statefulset.actRunner.config [default: Too complex. See values.yaml] Act runner custom configuration. See [Act Runner documentation](https://docs.gitea.com/usage/actions/act-runner#configuration) for details.
+## @param statefulset.dind.registry image registry, e.g. gcr.io,docker.io
 ## @param statefulset.dind.repository The Docker-in-Docker image
 ## @param statefulset.dind.tag The Docker-in-Docker image tag
+## @param statefulset.dind.digest Image digest. Allows to pin the given image tag. Useful for having control over mutable tags like `latest`
+## @param statefulset.dind.fullOverride Completely overrides the image registry, path/image, tag and digest.
 ## @param statefulset.dind.pullPolicy The Docker-in-Docker pullPolicy
 ## @param statefulset.dind.extraVolumeMounts Allows mounting extra volumes in the Docker-in-Docker container
 ## @param statefulset.dind.extraEnvs Allows adding custom environment variables, such as `DOCKER_IPTABLES_LEGACY`
@@ -40,9 +46,12 @@ statefulset:
   extraVolumes: []
 
   actRunner:
+    registry: "docker.gitea.com"
     repository: gitea/act_runner
     tag: 0.2.13
+    digest: ""
     pullPolicy: IfNotPresent
+    fullOverride: ""
     extraVolumeMounts: []
 
     # See full example here: https://gitea.com/gitea/act_runner/src/branch/main/internal/pkg/config/config.example.yaml
@@ -56,9 +65,12 @@ statefulset:
         docker_timeout: 300s
 
   dind:
+    registry: ""
     repository: docker
     tag: 28.3.3-dind
+    digest: ""
     pullPolicy: IfNotPresent
+    fullOverride: ""
     extraVolumeMounts: []
 
     # If the container keeps crashing in your environment, you might have to add the `DOCKER_IPTABLES_LEGACY` environment variable.
@@ -71,11 +83,23 @@ statefulset:
   persistence:
     size: 1Gi
 
+## @section Gitea Actions Init
+#
+## @param init.image.registry image registry, e.g. gcr.io,docker.io
+## @param init.image.repository The init image
+## @param init.image.tag the init image tag
+## @param init.image.digest Image digest. Allows to pin the given image tag. Useful for having control over mutable tags like `latest`
+## @param init.image.pullPolicy The init image pullPolicy
+## @param init.image.fullOverride Completely overrides the image registry, path/image, tag and digest.
 init:
   image:
+    registry: ""
     repository: busybox
     # Overrides the image tag whose default is the chart appVersion.
     tag: "1.37.0"
+    digest: ""
+    pullPolicy: IfNotPresent
+    fullOverride: ""
 
 ## Specify an existing token secret
 ##

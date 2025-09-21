@@ -32,7 +32,7 @@ spec:
     spec:
       initContainers:
         - name: init-gitea
-          image: "{{ .Values.init.image.repository }}:{{ .Values.init.image.tag }}"
+          image: "{{ include "gitea.actions.init.image" . }}"
           command:
             - sh
             - -c
@@ -45,7 +45,7 @@ spec:
               echo "Gitea has been reached!"
       containers:
         - name: act-runner
-          image: "{{ .Values.statefulset.actRunner.repository }}:{{ .Values.statefulset.actRunner.tag }}"
+          image: "{{ include "gitea.actions.actRunner.image" . }}"
           imagePullPolicy: {{ .Values.statefulset.actRunner.pullPolicy }}
           workingDir: /data
           env:
@@ -80,7 +80,7 @@ spec:
             {{- toYaml . | nindent 12 }}
             {{- end }}
         - name: dind
-          image: "{{ .Values.statefulset.dind.repository }}:{{ .Values.statefulset.dind.tag }}"
+          image: "{{ include "gitea.actions.dind.image" . }}"
           imagePullPolicy: {{ .Values.statefulset.dind.pullPolicy }}
           env:
             - name: DOCKER_HOST

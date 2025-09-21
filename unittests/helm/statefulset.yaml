@@ -6,6 +6,129 @@ templates:
   - templates/statefulset.yaml
   - templates/config-act-runner.yaml
 tests:
+  - it: act-runner uses fullOverride
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      existingSecret: "my-secret"
+      existingSecretKey: "my-secret-key"
+      statefulset.actRunner.fullOverride: test.io/act_runner:x.y.z
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-unittests-actions-act-runner
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: test.io/act_runner:x.y.z
+  - it: act-runner uses digest
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      existingSecret: "my-secret"
+      existingSecretKey: "my-secret-key"
+      statefulset.actRunner.tag: 0.2.13
+      statefulset.actRunner.digest: sha256:abcdef123456
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-unittests-actions-act-runner
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: docker.gitea.com/gitea/act_runner:0.2.13@sha256:abcdef123456
+  - it: act-runner uses global.imageRegistry
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      existingSecret: "my-secret"
+      existingSecretKey: "my-secret-key"
+      global.imageRegistry: test.io
+      statefulset.actRunner.tag: 0.2.13
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-unittests-actions-act-runner
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: test.io/gitea/act_runner:0.2.13
+  - it: dind uses fullOverride
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      existingSecret: "my-secret"
+      existingSecretKey: "my-secret-key"
+      statefulset.dind.fullOverride: test.io/dind:x.y.z
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-unittests-actions-act-runner
+      - equal:
+          path: spec.template.spec.containers[1].image
+          value: test.io/dind:x.y.z
+  - it: dind uses global.imageRegistry
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      existingSecret: "my-secret"
+      existingSecretKey: "my-secret-key"
+      global.imageRegistry: test.io
+      statefulset.dind.tag: 28.3.3-dind
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-unittests-actions-act-runner
+      - equal:
+          path: spec.template.spec.containers[1].image
+          value: test.io/docker:28.3.3-dind
+  - it: init uses fullOverride
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      existingSecret: "my-secret"
+      existingSecretKey: "my-secret-key"
+      init.image.fullOverride: test.io/busybox:x.y.z
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-unittests-actions-act-runner
+      - equal:
+          path: spec.template.spec.initContainers[0].image
+          value: test.io/busybox:x.y.z
+  - it: init uses global.imageRegistry
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      existingSecret: "my-secret"
+      existingSecretKey: "my-secret-key"
+      global.imageRegistry: test.io
+      init.image.tag: 1.37.0
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-unittests-actions-act-runner
+      - equal:
+          path: spec.template.spec.initContainers[0].image
+          value: test.io/busybox:1.37.0
   - it: doesn't renders a StatefulSet by default
     template: templates/statefulset.yaml
     asserts:

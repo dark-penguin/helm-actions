@@ -86,3 +86,46 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- define "gitea.actions.local_root_url" -}}
   {{- .Values.giteaRootURL -}}
 {{- end -}}
+
+{{/*
+Common create image implementation
+*/}}
+{{- define "gitea.actions.common.image" -}}
+{{- $fullOverride := .image.fullOverride | default "" -}}
+{{- $registry := .root.Values.global.imageRegistry | default .image.registry -}}
+{{- $repository :=  .image.repository -}}
+{{- $separator := ":" -}}
+{{- $tag := .image.tag | default .root.Chart.AppVersion | toString -}}
+{{- $digest := "" -}}
+{{- if .image.digest }}
+    {{- $digest = (printf "@%s" (.image.digest | toString)) -}}
+{{- end -}}
+{{- if $fullOverride }}
+    {{- printf "%s" $fullOverride -}}
+{{- else if $registry }}
+    {{- printf "%s/%s%s%s%s" $registry $repository $separator $tag $digest -}}
+{{- else -}}
+    {{- printf "%s%s%s%s" $repository $separator $tag $digest -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create image for the Gitea Actions Act Runner
+*/}}
+{{- define "gitea.actions.actRunner.image" -}}
+{{ include "gitea.actions.common.image" (dict "root" . "image" .Values.statefulset.actRunner) }}
+{{- end -}}
+
+{{/*
+Create image for DinD
+*/}}
+{{- define "gitea.actions.dind.image" -}}
+{{ include "gitea.actions.common.image" (dict "root" . "image" .Values.statefulset.dind) }}
+{{- end -}}
+
+{{/*
+Create image for Init
+*/}}
+{{- define "gitea.actions.init.image" -}}
+{{ include "gitea.actions.common.image" (dict "root" . "image" .Values.init.image) }}
+{{- end -}}
