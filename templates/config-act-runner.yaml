@@ -10,6 +10,10 @@ metadata:
 data:
   config.yaml: |
     {{- with .Values.statefulset.actRunner.config -}}
+    {{- if kindIs "string" . -}}
     {{ . | nindent 4}}
+    {{- else -}}
+    {{ toYaml . | nindent 4}}
+    {{- end -}}
     {{- end -}}
 {{- end }}

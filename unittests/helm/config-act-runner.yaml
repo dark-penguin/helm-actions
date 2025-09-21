@@ -42,3 +42,27 @@ tests:
             runner:
               labels:
                 - "ubuntu-latest"
+  - it: renders a ConfigMap with inline yaml
+    template: templates/config-act-runner.yaml
+    set:
+      enabled: true
+      statefulset:
+        actRunner:
+          config:
+            container:
+              valid_volumes:
+                - /var/run/docker.sock
+              options: -v /var/run/docker.sock:/var/run/docker.sock
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: ConfigMap
+          apiVersion: v1
+          name: gitea-unittests-actions-act-runner-config
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: '(?m)^\s*options:\s*-v /var/run/docker.sock:/var/run/docker.sock\s*$'
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: '(?m)^\s*valid_volumes:\s*\n\s*-\s*/var/run/docker.sock\s*$'
