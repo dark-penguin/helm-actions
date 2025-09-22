@@ -66,6 +66,9 @@ spec:
               value: /actrunner/config.yaml
             - name: TZ
               value: {{ .Values.statefulset.timezone | default "Etc/UTC" }}
+            {{- if .Values.statefulset.actRunner.extraEnvs }}
+            {{- toYaml .Values.statefulset.actRunner.extraEnvs | nindent 12 }}
+            {{- end }}
           resources:
             {{- toYaml .Values.statefulset.resources | nindent 12 }}
           volumeMounts:

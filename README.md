@@ -66,6 +66,7 @@ You should be good to go!
 | `statefulset.actRunner.extraVolumeMounts` | Allows mounting extra volumes in the act runner container                                                                                   | `[]`                           |
 | `statefulset.actRunner.config`            | Act runner custom configuration. See [Act Runner documentation](https://docs.gitea.com/usage/actions/act-runner#configuration) for details. | `Too complex. See values.yaml` |
 | `statefulset.dind.registry`               | image registry, e.g. gcr.io,docker.io                                                                                                       | `""`                           |
+| `statefulset.actRunner.extraEnvs`         | Allows adding custom environment variables                                                                                                  | `[]`                           |
 | `statefulset.dind.repository`             | The Docker-in-Docker image                                                                                                                  | `docker`                       |
 | `statefulset.dind.tag`                    | The Docker-in-Docker image tag                                                                                                              | `28.3.3-dind`                  |
 | `statefulset.dind.digest`                 | Image digest. Allows to pin the given image tag. Useful for having control over mutable tags like `latest`                                  | `""`                           |

@@ -129,6 +129,39 @@ tests:
       - equal:
           path: spec.template.spec.initContainers[0].image
           value: test.io/busybox:1.37.0
+  - it: renders additional environment variables for act-runner container in StatefulSet
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      existingSecret: "my-secret"
+      existingSecretKey: "my-secret-key"
+      statefulset:
+        actRunner:
+          extraEnvs:
+            - name: "CUSTOM_ENV"
+              value: "1"
+            - name: "GITEA_RUNNER_NAME"
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-unittests-actions-act-runner
+      - equal:
+          path: spec.template.spec.containers[0].env[7]
+          value:
+            name: CUSTOM_ENV
+            value: "1"
+      - matchRegex:
+          path: spec.template.spec.containers[0].env[8].valueFrom.fieldRef.fieldPath
+          pattern: "metadata\\.name"
+      - matchRegex:
+          path: spec.template.spec.containers[0].env[8].name
+          pattern: "GITEA_RUNNER_NAME"
   - it: doesn't renders a StatefulSet by default
     template: templates/statefulset.yaml
     asserts:
