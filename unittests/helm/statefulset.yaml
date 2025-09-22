@@ -40,7 +40,7 @@ tests:
           name: gitea-unittests-actions-act-runner
       - equal:
           path: spec.template.spec.containers[0].image
-          value: docker.gitea.com/gitea/act_runner:0.2.13@sha256:abcdef123456
+          value: docker.gitea.com/act_runner:0.2.13@sha256:abcdef123456
   - it: act-runner uses global.imageRegistry
     template: templates/statefulset.yaml
     set:
@@ -58,7 +58,7 @@ tests:
           name: gitea-unittests-actions-act-runner
       - equal:
           path: spec.template.spec.containers[0].image
-          value: test.io/gitea/act_runner:0.2.13
+          value: test.io/act_runner:0.2.13
   - it: dind uses fullOverride
     template: templates/statefulset.yaml
     set:

@@ -48,7 +48,7 @@ statefulset:
 
   actRunner:
     registry: "docker.gitea.com"
-    repository: gitea/act_runner
+    repository: act_runner
     tag: 0.2.13
     digest: ""
     pullPolicy: IfNotPresent
