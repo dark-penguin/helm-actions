@@ -75,6 +75,7 @@ You should be good to go!
 | `statefulset.dind.extraVolumeMounts`      | Allows mounting extra volumes in the Docker-in-Docker container                                                                             | `[]`                           |
 | `statefulset.dind.extraEnvs`              | Allows adding custom environment variables, such as `DOCKER_IPTABLES_LEGACY`                                                                | `[]`                           |
 | `statefulset.persistence.size`            | Size for persistence to store act runner data                                                                                               | `1Gi`                          |
+| `statefulset.securityContext`             | Customize the SecurityContext                                                                                                               | `{}`                           |
 | `existingSecret`                          | Secret that contains the token                                                                                                              | `""`                           |
 | `existingSecretKey`                       | Secret key                                                                                                                                  | `""`                           |
 | `giteaRootURL`                            | URL the act_runner registers and connect with                                                                                               | `""`                           |

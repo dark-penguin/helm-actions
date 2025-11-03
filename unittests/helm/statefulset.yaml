@@ -162,6 +162,60 @@ tests:
       - matchRegex:
           path: spec.template.spec.containers[0].env[8].name
           pattern: "GITEA_RUNNER_NAME"
+  - it: Has fsGroup in securityContext
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      existingSecret: "my-secret"
+      existingSecretKey: "my-secret-key"
+      statefulset.securityContext:
+        fsGroup: 1000
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-unittests-actions-act-runner
+      - equal:
+          path: spec.template.spec.securityContext["fsGroup"]
+          value: 1000
+  - it: Has fsGroupChangePolicy in securityContext
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      existingSecret: "my-secret"
+      existingSecretKey: "my-secret-key"
+      statefulset.securityContext:
+        fsGroupChangePolicy: OnRootMismatch
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-unittests-actions-act-runner
+      - equal:
+          path: spec.template.spec.securityContext["fsGroupChangePolicy"]
+          value: "OnRootMismatch"
+  - it: Has Always in securityContext
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      existingSecret: "my-secret"
+      existingSecretKey: "my-secret-key"
+      statefulset.securityContext:
+        fsGroupChangePolicy: Always
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-unittests-actions-act-runner
+      - equal:
+          path: spec.template.spec.securityContext["fsGroupChangePolicy"]
+          value: "Always"
   - it: doesn't renders a StatefulSet by default
     template: templates/statefulset.yaml
     asserts:
