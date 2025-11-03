@@ -45,18 +45,42 @@ spec:
                 echo "Trying again in 3 seconds..."
               done
               echo "Gitea has been reached!"
+        - name: dind
+          image: "{{ include "gitea.actions.dind.image" . }}"
+          imagePullPolicy: {{ .Values.statefulset.dind.pullPolicy }}
+          {{- if .Values.statefulset.dind.extraEnvs }}
+          env:
+            {{- toYaml .Values.statefulset.dind.extraEnvs | nindent 12 }}
+          {{- end }}
+          restartPolicy: Always
+          securityContext:
+            privileged: true
+          startupProbe:
+            exec:
+              command:
+                - /usr/bin/test
+                - -S
+                - /var/run/docker.sock
+          livenessProbe:
+            exec:
+              command:
+                - /usr/bin/test
+                - -S
+                - /var/run/docker.sock
+          resources:
+            {{- toYaml .Values.statefulset.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /var/run/
+              name: docker-socket
+            {{- with .Values.statefulset.dind.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
       containers:
         - name: act-runner
           image: "{{ include "gitea.actions.actRunner.image" . }}"
           imagePullPolicy: {{ .Values.statefulset.actRunner.pullPolicy }}
           workingDir: /data
           env:
-            - name: DOCKER_HOST
-              value: tcp://127.0.0.1:2376
-            - name: DOCKER_TLS_VERIFY
-              value: "1"
-            - name: DOCKER_CERT_PATH
-              value: /certs/client
             - name: GITEA_RUNNER_REGISTRATION_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -77,34 +101,12 @@ spec:
             - mountPath: /actrunner/config.yaml
               name: act-runner-config
               subPath: config.yaml
-            - mountPath: /certs/client
-              name: docker-certs
+            - mountPath: /var/run/docker.sock
+              name: docker-socket
+              subPath: docker.sock
             - mountPath: /data
               name: data-act-runner
             {{- with .Values.statefulset.actRunner.extraVolumeMounts }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
-        - name: dind
-          image: "{{ include "gitea.actions.dind.image" . }}"
-          imagePullPolicy: {{ .Values.statefulset.dind.pullPolicy }}
-          env:
-            - name: DOCKER_HOST
-              value: tcp://127.0.0.1:2376
-            - name: DOCKER_TLS_VERIFY
-              value: "1"
-            - name: DOCKER_CERT_PATH
-              value: /certs/client
-            {{- if .Values.statefulset.dind.extraEnvs }}
-            {{- toYaml .Values.statefulset.dind.extraEnvs | nindent 12 }}
-            {{- end }}
-          securityContext:
-            privileged: true
-          resources:
-            {{- toYaml .Values.statefulset.resources | nindent 12 }}
-          volumeMounts:
-            - mountPath: /certs/client
-              name: docker-certs
-            {{- with .Values.statefulset.dind.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
       {{- range $key, $value := .Values.statefulset.nodeSelector }}
@@ -123,7 +125,7 @@ spec:
         - name: act-runner-config
           configMap:
             name: {{ include "gitea.actions.fullname" . }}-act-runner-config
-        - name: docker-certs
+        - name: docker-socket
           emptyDir: {}
         {{- with .Values.statefulset.extraVolumes }}
         {{- toYaml . | nindent 8 }}

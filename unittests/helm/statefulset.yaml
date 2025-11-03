@@ -74,7 +74,7 @@ tests:
           apiVersion: apps/v1
           name: gitea-unittests-actions-act-runner
       - equal:
-          path: spec.template.spec.containers[1].image
+          path: spec.template.spec.initContainers[1].image
           value: test.io/dind:x.y.z
   - it: dind uses global.imageRegistry
     template: templates/statefulset.yaml
@@ -92,7 +92,7 @@ tests:
           apiVersion: apps/v1
           name: gitea-unittests-actions-act-runner
       - equal:
-          path: spec.template.spec.containers[1].image
+          path: spec.template.spec.initContainers[1].image
           value: test.io/docker:28.3.3-dind
   - it: init uses fullOverride
     template: templates/statefulset.yaml
@@ -152,15 +152,15 @@ tests:
           apiVersion: apps/v1
           name: gitea-unittests-actions-act-runner
       - equal:
-          path: spec.template.spec.containers[0].env[7]
+          path: spec.template.spec.containers[0].env[4]
           value:
             name: CUSTOM_ENV
             value: "1"
       - matchRegex:
-          path: spec.template.spec.containers[0].env[8].valueFrom.fieldRef.fieldPath
+          path: spec.template.spec.containers[0].env[5].valueFrom.fieldRef.fieldPath
           pattern: "metadata\\.name"
       - matchRegex:
-          path: spec.template.spec.containers[0].env[8].name
+          path: spec.template.spec.containers[0].env[5].name
           pattern: "GITEA_RUNNER_NAME"
   - it: Has fsGroup in securityContext
     template: templates/statefulset.yaml
@@ -235,7 +235,7 @@ tests:
           apiVersion: apps/v1
           name: gitea-unittests-actions-act-runner
       - equal:
-          path: spec.template.spec.containers[0].env[3]
+          path: spec.template.spec.containers[0].env[0]
           value:
             name: GITEA_RUNNER_REGISTRATION_TOKEN
             valueFrom:
@@ -256,7 +256,7 @@ tests:
           apiVersion: apps/v1
           name: gitea-unittests-actions-act-runner
       - equal:
-          path: spec.template.spec.containers[0].env[3]
+          path: spec.template.spec.containers[0].env[0]
           value:
             name: GITEA_RUNNER_REGISTRATION_TOKEN
             valueFrom:
@@ -295,7 +295,7 @@ tests:
           apiVersion: apps/v1
           name: gitea-unittests-actions-act-runner
       - equal:
-          path: spec.template.spec.containers[0].env[4]
+          path: spec.template.spec.containers[0].env[1]
           value:
             name: GITEA_INSTANCE_URL
             value: "http://git.example.com"
@@ -323,7 +323,7 @@ tests:
           apiVersion: apps/v1
           name: gitea-unittests-actions-act-runner
       - equal:
-          path: spec.template.spec.containers[0].env[4]
+          path: spec.template.spec.containers[0].env[1]
           value:
             name: GITEA_INSTANCE_URL
             value: "https://git.example.com"
@@ -351,7 +351,7 @@ tests:
           apiVersion: apps/v1
           name: gitea-unittests-actions-act-runner
       - equal:
-          path: spec.template.spec.containers[0].env[4]
+          path: spec.template.spec.containers[0].env[1]
           value:
             name: GITEA_INSTANCE_URL
             value: "https://git.example.com:8443"
@@ -375,7 +375,7 @@ tests:
               value: "custom env value"
     asserts:
       - equal:
-          path: spec.template.spec.containers[1].env[3]
+          path: spec.template.spec.initContainers[1].env[0]
           value:
             name: "CUSTOM_ENV_NAME"
             value: "custom env value"
@@ -425,7 +425,7 @@ tests:
           name: gitea-unittests-actions-act-runner
       - contains:
           any: true
-          path: spec.template.spec.containers[1].volumeMounts
+          path: spec.template.spec.initContainers[1].volumeMounts
           content:
             mountPath: /mnt
             name: my-dind-volume
