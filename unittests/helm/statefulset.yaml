@@ -429,3 +429,35 @@ tests:
           content:
             mountPath: /mnt
             name: my-dind-volume
+  - it: should interpret Gitea Root URL templating
+    template: templates/statefulset.yaml
+    set:
+      global:
+        gitea:
+          service:
+            name: "my-gitea-svc-http"
+            port: 3210
+      enabled: true
+      giteaRootURL: "http://{{ .Values.global.gitea.service.name }}:{{ .Values.global.gitea.service.port }}"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-unittests-actions-act-runner
+      - equal:
+          path: spec.template.spec.containers[0].env[1].name
+          value: "GITEA_INSTANCE_URL"
+      - equal:
+          path: spec.template.spec.containers[0].env[1].value
+          value: "http://my-gitea-svc-http:3210"
+      - equal:
+          path: spec.template.spec.initContainers[0].command[2]
+          value: |
+            echo 'Trying to reach Gitea on http://my-gitea-svc-http:3210'
+            until timeout 10 wget --no-check-certificate --spider http://my-gitea-svc-http:3210; do
+              sleep 3
+              echo "Trying again in 3 seconds..."
+            done
+            echo "Gitea has been reached!"

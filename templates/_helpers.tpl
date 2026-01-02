@@ -84,7 +84,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
 {{- define "gitea.actions.local_root_url" -}}
-  {{- .Values.giteaRootURL -}}
+  {{- tpl .Values.giteaRootURL . -}}
 {{- end -}}
 
 {{/*
