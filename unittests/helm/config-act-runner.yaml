@@ -48,7 +48,7 @@ tests:
       enabled: true
       statefulset:
         actRunner:
-          config:
+          config: |
             container:
               valid_volumes:
                 - /var/run/docker.sock

@@ -93,7 +93,8 @@ You should be good to go!
 
 ### Global
 
-| Name                   | Description                    | Value |
-| ---------------------- | ------------------------------ | ----- |
-| `global.imageRegistry` | global image registry override | `""`  |
-| `global.storageClass`  | global storage class override  | `""`  |
+| Name                      | Description                    | Value |
+| ------------------------- | ------------------------------ | ----- |
+| `global.imageRegistry`    | global image registry override | `""`  |
+| `global.imagePullSecrets` | global image pull secrets      | `""`  |
+| `global.storageClass`     | global storage class override  | `""`  |

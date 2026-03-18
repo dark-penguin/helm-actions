@@ -48,6 +48,22 @@ statefulset:
   extraVolumes: []
   securityContext: {}
 
+  dind:
+    registry: ""
+    repository: docker
+    tag: 28.3.3-dind
+    digest: ""
+    pullPolicy: IfNotPresent
+    fullOverride: ""
+    extraVolumeMounts: []
+
+    # If the container keeps crashing in your environment, you might have to add the `DOCKER_IPTABLES_LEGACY` environment variable.
+    # See https://github.com/docker-library/docker/issues/463#issuecomment-1881909456
+    extraEnvs:
+      []
+      #  - name: "DOCKER_IPTABLES_LEGACY"
+      #    value: "1"
+
   actRunner:
     registry: "docker.gitea.com"
     repository: act_runner
@@ -72,22 +88,6 @@ statefulset:
       container:
         require_docker: true
         docker_timeout: 300s
-
-  dind:
-    registry: ""
-    repository: docker
-    tag: 28.3.3-dind
-    digest: ""
-    pullPolicy: IfNotPresent
-    fullOverride: ""
-    extraVolumeMounts: []
-
-    # If the container keeps crashing in your environment, you might have to add the `DOCKER_IPTABLES_LEGACY` environment variable.
-    # See https://github.com/docker-library/docker/issues/463#issuecomment-1881909456
-    extraEnvs:
-      []
-      #  - name: "DOCKER_IPTABLES_LEGACY"
-      #    value: "1"
 
   persistence:
     size: 1Gi
@@ -121,7 +121,9 @@ giteaRootURL: ""
 ## @section Global
 #
 ## @param global.imageRegistry global image registry override
+## @param global.imagePullSecrets global image registry pull secrets
 ## @param global.storageClass global storage class override
 global:
   imageRegistry: ""
+  imagePullSecrets: []
   storageClass: ""
