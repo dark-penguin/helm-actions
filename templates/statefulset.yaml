@@ -47,6 +47,7 @@ spec:
               echo "Gitea has been reached!"
         - name: dind
           image: "{{ include "gitea.actions.dind.image" . }}"
+          restartPolicy: Always
           imagePullPolicy: {{ .Values.statefulset.dind.pullPolicy }}
           {{- if .Values.statefulset.dind.extraEnvs }}
           env:
