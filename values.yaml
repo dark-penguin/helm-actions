@@ -32,6 +32,7 @@
 ## @param statefulset.dind.extraEnvs Allows adding custom environment variables, such as `DOCKER_IPTABLES_LEGACY`
 ## @param statefulset.persistence.size Size for persistence to store act runner data
 ## @param statefulset.securityContext Customize the SecurityContext
+## @param statefulset.serviceAccountName Customize the service account name
 ## @param existingSecret Secret that contains the token
 ## @param existingSecretKey Secret key
 ## @param giteaRootURL URL the act_runner registers and connect with
@@ -47,6 +48,7 @@ statefulset:
   affinity: {}
   extraVolumes: []
   securityContext: {}
+  serviceAccountName: null
 
   actRunner:
     registry: "docker.gitea.com"
