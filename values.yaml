@@ -51,7 +51,7 @@ statefulset:
   actRunner:
     registry: "docker.gitea.com"
     repository: act_runner
-    tag: 0.2.13
+    tag: 0.3.0
     digest: ""
     pullPolicy: IfNotPresent
     fullOverride: ""
@@ -74,7 +74,7 @@ statefulset:
         docker_timeout: 300s
 
   dind:
-    registry: ""
+    registry: "docker.io"
     repository: docker
     tag: 28.3.3-dind
     digest: ""
