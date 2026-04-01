@@ -488,3 +488,15 @@ tests:
               echo "Trying again in 3 seconds..."
             done
             echo "Gitea has been reached!"
+  - it: should render service account name correctly
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      statefulset:
+        serviceAccountName: "my-service-account"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: "my-service-account"
