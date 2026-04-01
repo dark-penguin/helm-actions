@@ -92,8 +92,8 @@ You should be good to go!
 | `init.image.digest`       | Image digest. Allows to pin the given image tag. Useful for having control over mutable tags like `latest` | `""`           |
 | `init.image.pullPolicy`   | The init image pullPolicy                                                                                  | `IfNotPresent` |
 | `init.image.fullOverride` | Completely overrides the image registry, path/image, tag and digest.                                       | `""`           |
-| `preExtraInitContainers`  | Additional init containers to run in the pod before gitea-actions runs it owns init containers.            | `[]`           |
-| `postExtraInitContainers` | Additional init containers to run in the pod after gitea-actions runs it owns init containers.             | `[]`           |
+| `preExtraInitContainers`  | Additional init containers to run in the pod before Gitea-actions runs it owns init containers.            | `[]`           |
+| `postExtraInitContainers` | Additional init containers to run in the pod after Gitea-actions runs it owns init containers.             | `[]`           |
 
 ### Global
 
