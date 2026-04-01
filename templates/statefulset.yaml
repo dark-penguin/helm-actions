@@ -47,12 +47,12 @@ spec:
               echo "Gitea has been reached!"
         - name: dind
           image: "{{ include "gitea.actions.dind.image" . }}"
+          restartPolicy: Always
           imagePullPolicy: {{ .Values.statefulset.dind.pullPolicy }}
           {{- if .Values.statefulset.dind.extraEnvs }}
           env:
             {{- toYaml .Values.statefulset.dind.extraEnvs | nindent 12 }}
           {{- end }}
-          restartPolicy: Always
           securityContext:
             privileged: true
           startupProbe:
@@ -83,6 +83,7 @@ spec:
             {{- with .Values.statefulset.dind.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+      restartPolicy: Always
       containers:
         - name: act-runner
           image: "{{ include "gitea.actions.actRunner.image" . }}"
@@ -117,6 +118,12 @@ spec:
             {{- with .Values.statefulset.actRunner.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+      {{- range .Values.global.imagePullSecrets }}
+        - name: {{ . }}
+      {{- end }}
+      {{- end }}
       {{- range $key, $value := .Values.statefulset.nodeSelector }}
       nodeSelector:
         {{ $key }}: {{ $value | quote }}
@@ -143,7 +150,9 @@ spec:
         name: data-act-runner
       spec:
         accessModes: [ "ReadWriteOnce" ]
-        {{- include "gitea.actions.persistence.storageClass" . | nindent 8 }}
+        {{- if .Values.global.storageClass }}
+        {{- include "gitea.actions.persistence.storageClass" . | indent 8 }}
+        {{- end }}
         resources:
           requests:
             storage: {{ .Values.statefulset.persistence.size }}
