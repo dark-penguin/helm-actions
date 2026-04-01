@@ -429,6 +429,33 @@ tests:
           content:
             mountPath: /mnt
             name: my-dind-volume
+  - it: should interpret existingSecret & existingSecretKey templating
+    template: templates/statefulset.yaml
+    set:
+      gitea:
+        token:
+          secret:
+            name: "gitea-secret"
+            key: "secret-key"
+      enabled: true
+      existingSecret: "{{ .Release.Name }}-{{ .Values.gitea.token.secret.name}}"
+      existingSecretKey: "{{ .Values.gitea.token.secret.key}}"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-unittests-actions-act-runner
+      - equal:
+          path: spec.template.spec.containers[0].env[0].name
+          value: "GITEA_RUNNER_REGISTRATION_TOKEN"
+      - equal:
+          path: spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.name
+          value: "gitea-unittests-gitea-secret"
+      - equal:
+          path: spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.key
+          value: "secret-key"
   - it: should interpret Gitea Root URL templating
     template: templates/statefulset.yaml
     set:

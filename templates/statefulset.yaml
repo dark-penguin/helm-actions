@@ -84,8 +84,8 @@ spec:
             - name: GITEA_RUNNER_REGISTRATION_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: "{{ .Values.existingSecret | default $secretName }}"
-                  key: "{{ .Values.existingSecretKey | default "token" }}"
+                  name: "{{ (tpl .Values.existingSecret . ) | default $secretName }}"
+                  key: "{{ (tpl .Values.existingSecretKey . ) | default "token" }}"
             - name: GITEA_INSTANCE_URL
               value: {{ include "gitea.actions.local_root_url" . }}
             - name: CONFIG_FILE
