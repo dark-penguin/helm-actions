@@ -30,9 +30,13 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
+      restartPolicy: Always
       securityContext:
         {{- toYaml .Values.statefulset.securityContext | nindent 8 }}
       initContainers:
+        {{- if .Values.preExtraInitContainers }}
+        {{- toYaml .Values.preExtraInitContainers | nindent 8 }}
+        {{- end }}
         - name: init-gitea
           image: "{{ include "gitea.actions.init.image" . }}"
           command:
@@ -83,7 +87,9 @@ spec:
             {{- with .Values.statefulset.dind.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-      restartPolicy: Always
+        {{- if .Values.postExtraInitContainers }}
+        {{- toYaml .Values.postExtraInitContainers | nindent 8 }}
+        {{- end }}
       containers:
         - name: act-runner
           image: "{{ include "gitea.actions.actRunner.image" . }}"

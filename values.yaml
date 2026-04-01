@@ -116,11 +116,23 @@ init:
 
 ## Specify an existing token secret
 ##
-existingSecret: ""
-existingSecretKey: ""
+existingSecret: "secret"
+existingSecretKey: "key"
 
 ## Specify the root URL of the Gitea instance
-giteaRootURL: ""
+giteaRootURL: "gitea.com"
+
+## @param preExtraInitContainers Additional init containers to run in the pod before gitea-actions runs it owns init containers.
+preExtraInitContainers: []
+# - name: pre-init-container
+#   image: docker.io/library/busybox
+#   command: [ /bin/sh, -c, 'echo "Hello world! I am a pre init container."' ]
+
+## @param postExtraInitContainers Additional init containers to run in the pod after gitea-actions runs it owns init containers.
+postExtraInitContainers: []
+# - name: post-init-container
+#   image: docker.io/library/busybox
+#   command: [ /bin/sh, -c, 'echo "Hello world! I am a post init container."' ]
 
 ## @section Global
 #
