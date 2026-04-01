@@ -471,5 +471,5 @@ tests:
       - hasDocuments:
           count: 1
       - equal:
-        path: spec.template.spec.serviceAccountName
-        value: "my-service-account"
+          path: spec.template.spec.serviceAccountName
+          value: "my-service-account"
