@@ -48,7 +48,7 @@ statefulset:
   affinity: {}
   extraVolumes: []
   securityContext: {}
-  serviceAccountName: null
+  serviceAccountName: ""
 
   actRunner:
     registry: "docker.gitea.com"
