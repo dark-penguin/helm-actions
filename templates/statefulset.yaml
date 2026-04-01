@@ -60,13 +60,21 @@ spec:
               command:
                 - /usr/bin/test
                 - -S
+                {{- if .Values.statefulset.dind.rootless }}
+                - /run/user/{{ .Values.statefulset.dind.uid | default 1000 }}/docker.sock
+                {{- else }}
                 - /var/run/docker.sock
+                {{- end }}
           livenessProbe:
             exec:
               command:
                 - /usr/bin/test
                 - -S
+                {{- if .Values.statefulset.dind.rootless }}
+                - /run/user/{{ .Values.statefulset.dind.uid | default 1000 }}/docker.sock
+                {{- else }}
                 - /var/run/docker.sock
+                {{- end }}
           resources:
             {{- toYaml .Values.statefulset.resources | nindent 12 }}
           volumeMounts:

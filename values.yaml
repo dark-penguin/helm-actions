@@ -21,6 +21,8 @@
 ## @param statefulset.actRunner.fullOverride Completely overrides the image registry, path/image, tag and digest.
 ## @param statefulset.actRunner.extraVolumeMounts Allows mounting extra volumes in the act runner container
 ## @param statefulset.actRunner.config [default: Too complex. See values.yaml] Act runner custom configuration. See [Act Runner documentation](https://docs.gitea.com/usage/actions/act-runner#configuration) for details.
+## @param statefulset.dind.rootless [default: false] a simple flag to let helm know we are dealing with a rootless dind container
+## @param statefulset.dind.uid a field to set the running user id for the rootless dind container, so it knows where to look for the socket
 ## @param statefulset.dind.registry image registry, e.g. gcr.io,docker.io
 ## @param statefulset.actRunner.extraEnvs Allows adding custom environment variables
 ## @param statefulset.dind.repository The Docker-in-Docker image
@@ -74,6 +76,8 @@ statefulset:
         docker_timeout: 300s
 
   dind:
+    rootless: false
+    uid: ""
     registry: "docker.io"
     repository: docker
     tag: 28.3.3-dind
