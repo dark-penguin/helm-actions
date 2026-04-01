@@ -116,11 +116,11 @@ init:
 
 ## Specify an existing token secret
 ##
-existingSecret: "secret"
-existingSecretKey: "key"
+existingSecret: ""
+existingSecretKey: ""
 
 ## Specify the root URL of the Gitea instance
-giteaRootURL: "gitea.com"
+giteaRootURL: ""
 
 ## @param preExtraInitContainers Additional init containers to run in the pod before gitea-actions runs it owns init containers.
 preExtraInitContainers: []
