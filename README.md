@@ -6,17 +6,9 @@ The parameters which can be used to customize the deployment are described below
 
 If you want to propose a new feature or mechanism, submit an [issue here](https://gitea.com/gitea/helm-actions/issues).
 
-## Docs
-
-[Docs](./docs/README.md)
-
-## Rootless Defaults
-
-If `.Values.image.rootless: true`, then the following will occur. In case you use `.Values.image.fullOverride`, check that this works in your image:
-
-- If `.Values.provisioning.enabled: true`, then uses the rootless Gitea image, must match helm-Gitea.
-
 ## Quick-start
+
+[Documentation](./docs/README.md)
 
 To get started, add the Helm repo, assuming you have not already:
 
@@ -39,6 +31,26 @@ helm upgrade --install gitea-actions gitea-charts/actions -f values.yaml
 
 You should be good to go!
 
+### Runner Token Secret Template
+
+For reference, a template for the secret is given below:  
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: runner-secret
+  namespace: "my-gitea-namespace"
+type: Opaque
+stringData:
+    runner-token: "my-cool-runner-token-given-by-gitea"
+```
+
+### Rootless Options
+
+If `.Values.statefulset.dind.rootless: true` is set, then the following will be required:  
+`.Values.statefulset.dind.tag` must be a rootless image such as: `29.3.1-dind-rootless`
+
 ## Parameters
 
 ### Gitea Actions
@@ -46,8 +58,6 @@ You should be good to go!
 | Name                                      | Description                                                                                                                                 | Value                          |
 | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
 | `enabled`                                 | Create an act runner StatefulSet.                                                                                                           | `false`                        |
-| `init.image.repository`                   | The image used for the init containers                                                                                                      | `busybox`                      |
-| `init.image.tag`                          | The image tag used for the init containers                                                                                                  | `1.37.0`                       |
 | `statefulset.replicas`                    | the amount of (replica) runner pods deployed                                                                                                | `1`                            |
 | `statefulset.timezone`                    | is the timezone that will be set in the act_runner image                                                                                    | `Etc/UTC`                      |
 | `statefulset.annotations`                 | Act runner annotations                                                                                                                      | `{}`                           |
@@ -79,9 +89,6 @@ You should be good to go!
 | `statefulset.persistence.size`            | Size for persistence to store act runner data                                                                                               | `1Gi`                          |
 | `statefulset.securityContext`             | Customize the SecurityContext                                                                                                               | `{}`                           |
 | `statefulset.serviceAccountName`          | Customize the service account name                                                                                                          | `""`                           |
-| `existingSecret`                          | Secret that contains the token                                                                                                              | `""`                           |
-| `existingSecretKey`                       | Secret key                                                                                                                                  | `""`                           |
-| `giteaRootURL`                            | URL the act_runner registers and connect with                                                                                               | `""`                           |
 
 ### Gitea Actions Init
 
@@ -93,8 +100,26 @@ You should be good to go!
 | `init.image.digest`       | Image digest. Allows to pin the given image tag. Useful for having control over mutable tags like `latest` | `""`           |
 | `init.image.pullPolicy`   | The init image pullPolicy                                                                                  | `IfNotPresent` |
 | `init.image.fullOverride` | Completely overrides the image registry, path/image, tag and digest.                                       | `""`           |
-| `preExtraInitContainers`  | Additional init containers to run in the pod before Gitea-actions runs it owns init containers.            | `[]`           |
-| `postExtraInitContainers` | Additional init containers to run in the pod after Gitea-actions runs it owns init containers.             | `[]`           |
+
+### Runner Token Secret Configuration
+
+| Name                | Description                    | Value |
+| ------------------- | ------------------------------ | ----- |
+| `existingSecret`    | Secret that contains the token | `""`  |
+| `existingSecretKey` | Secret key                     | `""`  |
+
+### Gitea URL Setting
+
+| Name           | Description                                   | Value |
+| -------------- | --------------------------------------------- | ----- |
+| `giteaRootURL` | URL the act_runner registers and connect with | `""`  |
+
+### Extra Init Containers
+
+| Name                      | Description                                                                                     | Value |
+| ------------------------- | ----------------------------------------------------------------------------------------------- | ----- |
+| `preExtraInitContainers`  | Additional init containers to run in the pod before Gitea-actions runs it owns init containers. | `[]`  |
+| `postExtraInitContainers` | Additional init containers to run in the pod after Gitea-actions runs it owns init containers.  | `[]`  |
 
 ### Global
 

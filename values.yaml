@@ -2,8 +2,6 @@
 ## @section Gitea Actions
 #
 ## @param enabled Create an act runner StatefulSet.
-## @param init.image.repository The image used for the init containers
-## @param init.image.tag The image tag used for the init containers
 ## @param statefulset.replicas the amount of (replica) runner pods deployed
 ## @param statefulset.timezone is the timezone that will be set in the act_runner image
 ## @param statefulset.annotations Act runner annotations
@@ -35,9 +33,6 @@
 ## @param statefulset.persistence.size Size for persistence to store act runner data
 ## @param statefulset.securityContext Customize the SecurityContext
 ## @param statefulset.serviceAccountName Customize the service account name
-## @param existingSecret Secret that contains the token
-## @param existingSecretKey Secret key
-## @param giteaRootURL URL the act_runner registers and connect with
 enabled: false
 statefulset:
   replicas: 1
@@ -116,21 +111,27 @@ init:
     pullPolicy: IfNotPresent
     fullOverride: ""
 
-## Specify an existing token secret
-##
+## @section Runner Token Secret Configuration
+#
+## @param existingSecret Secret that contains the token
+## @param existingSecretKey Secret key
 existingSecret: ""
 existingSecretKey: ""
 
-## Specify the root URL of the Gitea instance
+## @section Gitea URL Setting
+#
+## @param giteaRootURL URL the act_runner registers and connect with
 giteaRootURL: ""
 
+## @section Extra Init Containers
+#
 ## @param preExtraInitContainers Additional init containers to run in the pod before gitea-actions runs it owns init containers.
+## @param postExtraInitContainers Additional init containers to run in the pod after gitea-actions runs it owns init containers.
 preExtraInitContainers: []
 # - name: pre-init-container
 #   image: docker.io/library/busybox
 #   command: [ /bin/sh, -c, 'echo "Hello world! I am a pre init container."' ]
 
-## @param postExtraInitContainers Additional init containers to run in the pod after gitea-actions runs it owns init containers.
 postExtraInitContainers: []
 # - name: post-init-container
 #   image: docker.io/library/busybox
