@@ -82,7 +82,7 @@ statefulset:
     uid: ""
     registry: "docker.io"
     repository: docker
-    tag: 28.3.3-dind
+    tag: 29.3.1-dind
     digest: ""
     pullPolicy: IfNotPresent
     fullOverride: ""
