@@ -86,7 +86,7 @@ spec:
             {{- toYaml .Values.statefulset.resources | nindent 12 }}
           volumeMounts:
             {{- if .Values.statefulset.dind.rootless }}
-            - mouthPath: /run/user/{{ .Values.statefulset.dind.uid | default 1000 }}/
+            - mountPath: /run/user/{{ .Values.statefulset.dind.uid | default 1000 }}/
             {{- else }}
             - mountPath: /var/run/
             {{- end }}
