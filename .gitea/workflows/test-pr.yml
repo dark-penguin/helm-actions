@@ -47,5 +47,5 @@ jobs:
           make readme
           git diff --exit-code --name-only README.md
       - name: yaml lint
-        uses: ibiqlik/action-yamllint@v3 # Github / Act
-        #uses: https://github.com/ibiqlik/action-yamllint@v3 # Gitea
+        #uses: ibiqlik/action-yamllint@v3 # Github / Act
+        uses: https://github.com/ibiqlik/action-yamllint@v3 # Gitea
