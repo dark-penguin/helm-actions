@@ -14,57 +14,69 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+
+      - name: install Docker CLI
+        uses: https://github.com/docker/setup-buildx-action@v4 # Gitea
+        #uses: docker/setup-buildx-action@v4 # Github / Act
+
+      - name: install Helm
+        uses: https://github.com/Azure/setup-helm@v5 # Gitea
+        #uses: Azure/setup-helm@v5 # Github / Act
+        with:
+          version: "${{ env.HELM_VERSION }}"
+
       - name: install tools
         run: |
-          apt update -y
-          apt install -y curl ca-certificates curl gnupg
-          # helm
-          curl -O https://get.helm.sh/helm-v${{ env.HELM_VERSION }}-linux-amd64.tar.gz
-          tar -xzf helm-v${{ env.HELM_VERSION }}-linux-amd64.tar.gz
-          mv linux-amd64/helm /usr/local/bin/
-          rm -rf linux-amd64 helm-v${{ env.HELM_VERSION }}-linux-amd64.tar.gz
-          helm version
-          # docker
-          install -m 0755 -d /etc/apt/keyrings
-          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-          chmod a+r /etc/apt/keyrings/docker.gpg
-          echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-          apt update -y
-          apt install -y python3 python3-pip apt-transport-https docker-ce-cli
+          apt update
+          apt install -y curl ca-certificates curl gnupg python3 python3-pip apt-transport-https
           pip install awscli --break-system-packages
 
-      - name: Import GPG key
+      - name: import GPG key
         id: import_gpg
-        uses: https://github.com/crazy-max/ghaction-import-gpg@v7
+        uses: https://github.com/crazy-max/ghaction-import-gpg@v7 # Gitea
+        #uses: crazy-max/ghaction-import-gpg@v7 # Github / Act
         with:
           gpg_private_key: ${{ secrets.GPGSIGN_KEY }}
           passphrase: ${{ secrets.GPGSIGN_PASSPHRASE }}
           fingerprint: CC64B1DB67ABBEECAB24B6455FC346329753F4B0
 
+      - name: log into Docker Hub
+        uses: https://github.com/docker/login-action@v4 # Gitea
+        #uses: docker/login-action@v4 # Github / Act
+        with:
+          username: ${{ secrets.DOCKER_CHARTS_USERNAME }}
+          password: ${{ secrets.DOCKER_CHARTS_PASSWORD }}
+
       # Using helm gpg plugin as 'helm package --sign' has issues with gpg2: https://github.com/helm/helm/issues/2843
       - name: package chart
         run: |
-          echo ${{ secrets.DOCKER_CHARTS_PASSWORD }} | docker login -u ${{ secrets.DOCKER_CHARTS_USERNAME }} --password-stdin
-          # FIXME: use upstream after https://github.com/technosophos/helm-gpg/issues/1 is solved
-          helm plugin install https://github.com/pat-s/helm-gpg
+          # Install Helm GPG plugin
+          helm plugin install https://github.com/technosophos/helm-gpg.git --verify=false
           helm dependency build
           helm package --version "${GITHUB_REF#refs/tags/v}" ./
+
+          # Package the chart
           mkdir actions
           mv actions*.tgz actions/
           curl -s -L -o actions/index.yaml https://dl.gitea.com/charts/index.yaml
           helm repo index actions/ --url https://dl.gitea.com/charts --merge actions/index.yaml
-          # push to dockerhub
+
+          # Push to Docker Hub
           echo ${{ secrets.DOCKER_CHARTS_PASSWORD }} | helm registry login -u ${{ secrets.DOCKER_CHARTS_USERNAME }} registry-1.docker.io --password-stdin
           helm push actions/actions-${GITHUB_REF#refs/tags/v}.tgz oci://registry-1.docker.io/giteacharts
           helm registry logout registry-1.docker.io
+        env:
+          TAR_OPTIONS: "--wildcards"
 
       - name: aws credential configure
-        uses: https://github.com/aws-actions/configure-aws-credentials@v6
+        uses: https://github.com/aws-actions/configure-aws-credentials@v6 # Gitea
+        #uses: aws-actions/configure-aws-credentials@v6 # Github / Act
         with:
           aws-access-key-id: ${{ secrets.AWS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Copy files to S3 and clear cache
+      - name: copy files to S3 and clear cache
+        if: startsWith(github.ref, 'refs/tags/')
         run: |
           aws s3 sync actions/ s3://${{ secrets.AWS_S3_BUCKET}}/charts/
