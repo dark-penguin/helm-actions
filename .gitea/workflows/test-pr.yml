@@ -16,7 +16,7 @@ env:
 jobs:
   check-and-test:
     runs-on: ubuntu-latest
-    container: alpine/helm:3.20.1
+    container: alpine/helm:4.1.3
     steps:
       - name: install tools
         run: |
@@ -30,12 +30,13 @@ jobs:
       - name: install chart dependencies
         run: helm dependency build
       - name: lint
-        run: helm lint
+        run: helm lint .
       - name: template
         run: helm template --debug gitea-actions .
       - name: prepare unit test environment
         run: |
-          helm plugin install --version ${{ env.HELM_UNITTEST_VERSION }} https://github.com/helm-unittest/helm-unittest
+          helm plugin install --version ${{ env.HELM_UNITTEST_VERSION }} --verify=false \
+            https://github.com/helm-unittest/helm-unittest.git # https://github.com/helm-unittest/helm-unittest?tab=readme-ov-file#install
           git submodule update --init --recursive
       - name: unit tests
         env:
@@ -47,4 +48,5 @@ jobs:
           make readme
           git diff --exit-code --name-only README.md
       - name: yaml lint
-        uses: https://github.com/ibiqlik/action-yamllint@v3
+        # uses: ibiqlik/action-yamllint@v3 # Github / Act
+        uses: https://github.com/ibiqlik/action-yamllint@v3 # Gitea
