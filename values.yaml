@@ -14,7 +14,10 @@
 ## @param statefulset.persistence.size Size for persistence to store act runner data
 ## @param statefulset.securityContext Customize the SecurityContext
 ## @param statefulset.serviceAccountName Customize the service account name
+## @param statefulset.runtimeClassName Select a different RuntimeClass for pods
 ## @param statefulset.hostAliases Inject entries into the /etc/hosts file
+#
+## @param statefulset.persistence.size Size for persistence to store act runner data
 #
 ## @param statefulset.actRunner.registry image registry, e.g. gcr.io,docker.io
 ## @param statefulset.actRunner.repository The Gitea act runner image
@@ -36,6 +39,7 @@
 ## @param statefulset.dind.pullPolicy The Docker-in-Docker pullPolicy
 ## @param statefulset.dind.extraVolumeMounts Allows mounting extra volumes in the Docker-in-Docker container
 ## @param statefulset.dind.extraEnvs Allows adding custom environment variables, such as `DOCKER_IPTABLES_LEGACY`
+#
 enabled: false
 statefulset:
   replicas: 1
@@ -49,6 +53,7 @@ statefulset:
   extraVolumes: []
   securityContext: {}
   serviceAccountName: ""
+  runtimeClassName: ""
 
   # Add /etc/hosts injections into the pods
   hostAliases:
@@ -57,6 +62,9 @@ statefulset:
   #    hostnames:
   #      - googel.com
   #      - googol.com
+
+  persistence:
+    size: 1Gi
 
   actRunner:
     registry: "docker.gitea.com"
@@ -101,9 +109,6 @@ statefulset:
       #  - name: "DOCKER_IPTABLES_LEGACY"
       #    value: "1"
 
-  persistence:
-    size: 1Gi
-
 ## @section Gitea Actions Init
 #
 ## @param init.image.registry image registry, e.g. gcr.io,docker.io
@@ -136,8 +141,8 @@ giteaRootURL: ""
 
 ## @section Extra Init Containers
 #
-## @param preExtraInitContainers Additional init containers to run in the pod before gitea-actions runs it owns init containers.
-## @param postExtraInitContainers Additional init containers to run in the pod after gitea-actions runs it owns init containers.
+## @param preExtraInitContainers Additional init containers to run in the pod before Gitea-actions runs it owns init containers.
+## @param postExtraInitContainers Additional init containers to run in the pod after Gitea-actions runs it owns init containers.
 preExtraInitContainers: []
 # - name: pre-init-container
 #   image: docker.io/library/busybox
