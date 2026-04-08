@@ -67,6 +67,10 @@ If `.Values.statefulset.dind.rootless: true` is set, then the following will be 
 | `statefulset.tolerations`                 | Tolerations for the statefulset                                                                                                             | `[]`                           |
 | `statefulset.affinity`                    | Affinity for the statefulset                                                                                                                | `{}`                           |
 | `statefulset.extraVolumes`                | Extra volumes for the statefulset                                                                                                           | `[]`                           |
+| `statefulset.persistence.size`            | Size for persistence to store act runner data                                                                                               | `1Gi`                          |
+| `statefulset.securityContext`             | Customize the SecurityContext                                                                                                               | `{}`                           |
+| `statefulset.serviceAccountName`          | Customize the service account name                                                                                                          | `""`                           |
+| `statefulset.hostAliases`                 | Inject entries into the /etc/hosts file                                                                                                     | `[]`                           |
 | `statefulset.actRunner.registry`          | image registry, e.g. gcr.io,docker.io                                                                                                       | `docker.gitea.com`             |
 | `statefulset.actRunner.repository`        | The Gitea act runner image                                                                                                                  | `act_runner`                   |
 | `statefulset.actRunner.tag`               | The Gitea act runner tag                                                                                                                    | `0.3.0`                        |
@@ -75,10 +79,10 @@ If `.Values.statefulset.dind.rootless: true` is set, then the following will be 
 | `statefulset.actRunner.fullOverride`      | Completely overrides the image registry, path/image, tag and digest.                                                                        | `""`                           |
 | `statefulset.actRunner.extraVolumeMounts` | Allows mounting extra volumes in the act runner container                                                                                   | `[]`                           |
 | `statefulset.actRunner.config`            | Act runner custom configuration. See [Act Runner documentation](https://docs.gitea.com/usage/actions/act-runner#configuration) for details. | `Too complex. See values.yaml` |
+| `statefulset.actRunner.extraEnvs`         | Allows adding custom environment variables                                                                                                  | `[]`                           |
 | `statefulset.dind.rootless`               | a simple flag to let helm know we are dealing with a rootless dind container                                                                | `false`                        |
 | `statefulset.dind.uid`                    | a field to set the running user id for the rootless dind container, so it knows where to look for the socket                                | `""`                           |
 | `statefulset.dind.registry`               | image registry, e.g. gcr.io,docker.io                                                                                                       | `docker.io`                    |
-| `statefulset.actRunner.extraEnvs`         | Allows adding custom environment variables                                                                                                  | `[]`                           |
 | `statefulset.dind.repository`             | The Docker-in-Docker image                                                                                                                  | `docker`                       |
 | `statefulset.dind.tag`                    | The Docker-in-Docker image tag                                                                                                              | `29.3.1-dind`                  |
 | `statefulset.dind.digest`                 | Image digest. Allows to pin the given image tag. Useful for having control over mutable tags like `latest`                                  | `""`                           |
@@ -86,9 +90,6 @@ If `.Values.statefulset.dind.rootless: true` is set, then the following will be 
 | `statefulset.dind.pullPolicy`             | The Docker-in-Docker pullPolicy                                                                                                             | `IfNotPresent`                 |
 | `statefulset.dind.extraVolumeMounts`      | Allows mounting extra volumes in the Docker-in-Docker container                                                                             | `[]`                           |
 | `statefulset.dind.extraEnvs`              | Allows adding custom environment variables, such as `DOCKER_IPTABLES_LEGACY`                                                                | `[]`                           |
-| `statefulset.persistence.size`            | Size for persistence to store act runner data                                                                                               | `1Gi`                          |
-| `statefulset.securityContext`             | Customize the SecurityContext                                                                                                               | `{}`                           |
-| `statefulset.serviceAccountName`          | Customize the service account name                                                                                                          | `""`                           |
 
 ### Gitea Actions Init
 

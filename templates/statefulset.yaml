@@ -34,8 +34,14 @@ spec:
       {{- if .Values.statefulset.serviceAccountName }}
       serviceAccountName: {{ .Values.statefulset.serviceAccountName }}
       {{- end }}
+      {{- if .Values.statefulset.securityContext }}
       securityContext:
         {{- toYaml .Values.statefulset.securityContext | nindent 8 }}
+      {{- end }}
+      {{- if .Values.statefulset.hostAliases }}
+      hostAliases:
+        {{- toYaml .Values.statefulset.hostAliases | nindent 8 }}
+      {{- end }}
       initContainers:
         {{- if .Values.preExtraInitContainers }}
         {{- toYaml .Values.preExtraInitContainers | nindent 8 }}
