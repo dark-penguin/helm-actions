@@ -71,6 +71,10 @@ spec:
           {{- end }}
           securityContext:
             privileged: true
+          {{- if .Values.statefulset.dind.extraArgs }}
+          args:
+            {{- toYaml .Values.statefulset.dind.extraArgs | nindent 12 }}
+          {{- end }}
           startupProbe:
             exec:
               command:

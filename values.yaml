@@ -39,6 +39,7 @@
 ## @param statefulset.dind.pullPolicy The Docker-in-Docker pullPolicy
 ## @param statefulset.dind.extraVolumeMounts Allows mounting extra volumes in the Docker-in-Docker container
 ## @param statefulset.dind.extraEnvs Allows adding custom environment variables, such as `DOCKER_IPTABLES_LEGACY`
+## @param statefulset.dind.extraArgs Allows adding custom arguments to the Docker Daemon
 #
 enabled: false
 statefulset:
@@ -108,6 +109,12 @@ statefulset:
       []
       #  - name: "DOCKER_IPTABLES_LEGACY"
       #    value: "1"
+
+    # Option to add extra arguments/commands to the container/pod:
+    # [#22](https://gitea.com/gitea/helm-actions/issues/22) [k8s docs](https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/)
+    extraArgs:
+      []
+      #  - --mtu=1400
 
 ## @section Gitea Actions Init
 #

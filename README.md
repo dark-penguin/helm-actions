@@ -92,6 +92,7 @@ If `.Values.statefulset.dind.rootless: true` is set, then the following will be 
 | `statefulset.dind.pullPolicy`             | The Docker-in-Docker pullPolicy                                                                                                             | `IfNotPresent`                 |
 | `statefulset.dind.extraVolumeMounts`      | Allows mounting extra volumes in the Docker-in-Docker container                                                                             | `[]`                           |
 | `statefulset.dind.extraEnvs`              | Allows adding custom environment variables, such as `DOCKER_IPTABLES_LEGACY`                                                                | `[]`                           |
+| `statefulset.dind.extraArgs`              | Allows adding custom arguments to the Docker Daemon                                                                                         | `[]`                           |
 
 ### Gitea Actions Init
 
