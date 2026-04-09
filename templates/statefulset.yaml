@@ -49,6 +49,23 @@ spec:
         {{- if .Values.preExtraInitContainers }}
         {{- toYaml .Values.preExtraInitContainers | nindent 8 }}
         {{- end }}
+        {{- if .Values.statefulset.actRunner.flushCache }}
+        - name: cache-flusher
+          image: "{{ include "gitea.actions.init.image" . }}"
+          command:
+            - sh
+            - -c
+            - |
+              if [[ -f /data/.runner ]]; then
+                echo "Removing cache at /data/.runner"
+                rm -v /data/.runner
+              else
+                echo "No .runner file to remove"
+              fi
+          volumeMounts:
+            - mountPath: /data
+              name: data-act-runner
+        {{- end }}
         - name: init-gitea
           image: "{{ include "gitea.actions.init.image" . }}"
           command:
