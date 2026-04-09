@@ -1,6 +1,6 @@
 suite: actions template | consistency checks
 release:
-  name: gitea-unittests
+  name: gitea-actions-unittests
   namespace: testing
 templates:
   - templates/01-consistency-checks.yaml

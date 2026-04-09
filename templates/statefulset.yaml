@@ -32,14 +32,14 @@ spec:
     spec:
       restartPolicy: Always
       {{- if .Values.statefulset.serviceAccountName }}
-      serviceAccountName: {{ .Values.statefulset.serviceAccountName }}
+      serviceAccountName: {{ .Values.statefulset.serviceAccountName | quote }}
       {{- end }}
       {{- if .Values.statefulset.securityContext }}
       securityContext:
         {{- toYaml .Values.statefulset.securityContext | nindent 8 }}
       {{- end }}
       {{- if .Values.statefulset.runtimeClassName }}
-        runtimeClassName: {{ .Values.statefulset.runtimeClassName }}
+      runtimeClassName: {{ .Values.statefulset.runtimeClassName | quote }}
       {{- end }}
       {{- if .Values.statefulset.hostAliases }}
       hostAliases:

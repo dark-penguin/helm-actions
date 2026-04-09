@@ -1,17 +1,225 @@
 suite: actions template | statefulset
 release:
-  name: gitea-unittests
+  name: gitea-actions-unittests
   namespace: testing
 templates:
   - templates/statefulset.yaml
   - templates/config-act-runner.yaml
 tests:
-  - it: act-runner uses fullOverride
+#
+## GENERIC
+#
+
+  - it: doesn't renders a StatefulSet by default
+    template: templates/statefulset.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: renders a StatefulSet (that tracks changes of the runner configuration as annotation)
+    template: templates/statefulset.yaml
+    set:
+      image.tag: "1.22.3" # lock image tag to prevent test failures on future Gitea upgrades
+      enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-actions-unittests-act-runner
+      - equal:
+          path: spec.template.metadata.annotations["checksum/config"]
+          value: "368836e4e5d947f06f2d65c7cc3fc3ad050aaced506443f54a8ffc17bb11afd2"
+
+  - it: Has fsGroup in securityContext
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      statefulset.securityContext:
+        fsGroup: 1000
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-actions-unittests-act-runner
+      - equal:
+          path: spec.template.spec.securityContext["fsGroup"]
+          value: 1000
+
+  - it: Has fsGroupChangePolicy in securityContext
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      statefulset.securityContext:
+        fsGroupChangePolicy: OnRootMismatch
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-actions-unittests-act-runner
+      - equal:
+          path: spec.template.spec.securityContext["fsGroupChangePolicy"]
+          value: "OnRootMismatch"
+
+  - it: Has Always in securityContext
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      statefulset.securityContext:
+        fsGroupChangePolicy: Always
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-actions-unittests-act-runner
+      - equal:
+          path: spec.template.spec.securityContext["fsGroupChangePolicy"]
+          value: "Always"
+
+  - it: renders a StatefulSet (with given existingSecret/existingSecretKey)
     template: templates/statefulset.yaml
     set:
       enabled: true
       existingSecret: "my-secret"
       existingSecretKey: "my-secret-key"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-actions-unittests-act-runner
+      - equal:
+          path: spec.template.spec.containers[0].env[0]
+          value:
+            name: GITEA_RUNNER_REGISTRATION_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: "my-secret"
+                key: "my-secret-key"
+
+  - it: renders a StatefulSet http (with correct GITEA_INSTANCE_URL env from giteaRootURL)
+    template: templates/statefulset.yaml
+    set:
+      giteaRootURL: "http://git.example.com"
+      enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-actions-unittests-act-runner
+      - equal:
+          path: spec.template.spec.containers[0].env[1]
+          value:
+            name: GITEA_INSTANCE_URL
+            value: "http://git.example.com"
+      - equal:
+          path: spec.template.spec.initContainers[0].command[2]
+          value: |
+            echo 'Trying to reach Gitea on http://git.example.com'
+            until timeout 10 wget --no-check-certificate --spider http://git.example.com; do
+              sleep 3
+              echo "Trying again in 3 seconds..."
+            done
+            echo "Gitea has been reached!"
+
+  - it: renders a StatefulSet https (with correct GITEA_INSTANCE_URL env from giteaRootURL)
+    template: templates/statefulset.yaml
+    set:
+      giteaRootURL: "https://git.example.com"
+      enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-actions-unittests-act-runner
+      - equal:
+          path: spec.template.spec.containers[0].env[1]
+          value:
+            name: GITEA_INSTANCE_URL
+            value: "https://git.example.com"
+      - equal:
+          path: spec.template.spec.initContainers[0].command[2]
+          value: |
+            echo 'Trying to reach Gitea on https://git.example.com'
+            until timeout 10 wget --no-check-certificate --spider https://git.example.com; do
+              sleep 3
+              echo "Trying again in 3 seconds..."
+            done
+            echo "Gitea has been reached!"
+
+  - it: renders a StatefulSet https with explicit port (with correct GITEA_INSTANCE_URL env from giteaRootURL)
+    template: templates/statefulset.yaml
+    set:
+      giteaRootURL: "https://git.example.com:8443"
+      enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-actions-unittests-act-runner
+      - equal:
+          path: spec.template.spec.containers[0].env[1]
+          value:
+            name: GITEA_INSTANCE_URL
+            value: "https://git.example.com:8443"
+      - equal:
+          path: spec.template.spec.initContainers[0].command[2]
+          value: |
+            echo 'Trying to reach Gitea on https://git.example.com:8443'
+            until timeout 10 wget --no-check-certificate --spider https://git.example.com:8443; do
+              sleep 3
+              echo "Trying again in 3 seconds..."
+            done
+            echo "Gitea has been reached!"
+
+  - it: should render service account name correctly
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      statefulset:
+        serviceAccountName: "my-service-account"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: "my-service-account"
+
+  - it: should render runtime class name correctly
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      statefulset:
+        runtimeClassName: "my-runtime-class-name"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.template.spec.runtimeClassName
+          value: "my-runtime-class-name"
+
+#
+## ACT_RUNNER
+#
+
+  - it: act-runner uses fullOverride
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
       statefulset.actRunner.fullOverride: test.io/act_runner:x.y.z
     asserts:
       - hasDocuments:
@@ -19,17 +227,16 @@ tests:
       - containsDocument:
           kind: StatefulSet
           apiVersion: apps/v1
-          name: gitea-unittests-actions-act-runner
+          name: gitea-actions-unittests-act-runner
       - equal:
           path: spec.template.spec.containers[0].image
           value: test.io/act_runner:x.y.z
+
   - it: act-runner uses digest
     template: templates/statefulset.yaml
     set:
       enabled: true
-      existingSecret: "my-secret"
-      existingSecretKey: "my-secret-key"
-      statefulset.actRunner.tag: 0.2.13
+      statefulset.actRunner.tag: 0.3.1
       statefulset.actRunner.digest: sha256:abcdef123456
     asserts:
       - hasDocuments:
@@ -37,104 +244,32 @@ tests:
       - containsDocument:
           kind: StatefulSet
           apiVersion: apps/v1
-          name: gitea-unittests-actions-act-runner
+          name: gitea-actions-unittests-act-runner
       - equal:
           path: spec.template.spec.containers[0].image
-          value: docker.gitea.com/act_runner:0.2.13@sha256:abcdef123456
+          value: docker.gitea.com/act_runner:0.3.1@sha256:abcdef123456
+
   - it: act-runner uses global.imageRegistry
     template: templates/statefulset.yaml
     set:
       enabled: true
-      existingSecret: "my-secret"
-      existingSecretKey: "my-secret-key"
       global.imageRegistry: test.io
-      statefulset.actRunner.tag: 0.2.13
+      statefulset.actRunner.tag: 0.3.1
     asserts:
       - hasDocuments:
           count: 1
       - containsDocument:
           kind: StatefulSet
           apiVersion: apps/v1
-          name: gitea-unittests-actions-act-runner
+          name: gitea-actions-unittests-act-runner
       - equal:
           path: spec.template.spec.containers[0].image
-          value: test.io/act_runner:0.2.13
-  - it: dind uses fullOverride
-    template: templates/statefulset.yaml
-    set:
-      enabled: true
-      existingSecret: "my-secret"
-      existingSecretKey: "my-secret-key"
-      statefulset.dind.fullOverride: test.io/dind:x.y.z
-    asserts:
-      - hasDocuments:
-          count: 1
-      - containsDocument:
-          kind: StatefulSet
-          apiVersion: apps/v1
-          name: gitea-unittests-actions-act-runner
-      - equal:
-          path: spec.template.spec.initContainers[1].image
-          value: test.io/dind:x.y.z
-  - it: dind uses global.imageRegistry
-    template: templates/statefulset.yaml
-    set:
-      enabled: true
-      existingSecret: "my-secret"
-      existingSecretKey: "my-secret-key"
-      global.imageRegistry: test.io
-      statefulset.dind.tag: 28.3.3-dind
-    asserts:
-      - hasDocuments:
-          count: 1
-      - containsDocument:
-          kind: StatefulSet
-          apiVersion: apps/v1
-          name: gitea-unittests-actions-act-runner
-      - equal:
-          path: spec.template.spec.initContainers[1].image
-          value: test.io/docker:28.3.3-dind
-  - it: init uses fullOverride
-    template: templates/statefulset.yaml
-    set:
-      enabled: true
-      existingSecret: "my-secret"
-      existingSecretKey: "my-secret-key"
-      init.image.fullOverride: test.io/busybox:x.y.z
-    asserts:
-      - hasDocuments:
-          count: 1
-      - containsDocument:
-          kind: StatefulSet
-          apiVersion: apps/v1
-          name: gitea-unittests-actions-act-runner
-      - equal:
-          path: spec.template.spec.initContainers[0].image
-          value: test.io/busybox:x.y.z
-  - it: init uses global.imageRegistry
-    template: templates/statefulset.yaml
-    set:
-      enabled: true
-      existingSecret: "my-secret"
-      existingSecretKey: "my-secret-key"
-      global.imageRegistry: test.io
-      init.image.tag: 1.37.0
-    asserts:
-      - hasDocuments:
-          count: 1
-      - containsDocument:
-          kind: StatefulSet
-          apiVersion: apps/v1
-          name: gitea-unittests-actions-act-runner
-      - equal:
-          path: spec.template.spec.initContainers[0].image
-          value: test.io/busybox:1.37.0
+          value: test.io/act_runner:0.3.1
+
   - it: renders additional environment variables for act-runner container in StatefulSet
     template: templates/statefulset.yaml
     set:
       enabled: true
-      existingSecret: "my-secret"
-      existingSecretKey: "my-secret-key"
       statefulset:
         actRunner:
           extraEnvs:
@@ -150,7 +285,7 @@ tests:
       - containsDocument:
           kind: StatefulSet
           apiVersion: apps/v1
-          name: gitea-unittests-actions-act-runner
+          name: gitea-actions-unittests-act-runner
       - equal:
           path: spec.template.spec.containers[0].env[4]
           value:
@@ -162,223 +297,7 @@ tests:
       - matchRegex:
           path: spec.template.spec.containers[0].env[5].name
           pattern: "GITEA_RUNNER_NAME"
-  - it: Has fsGroup in securityContext
-    template: templates/statefulset.yaml
-    set:
-      enabled: true
-      existingSecret: "my-secret"
-      existingSecretKey: "my-secret-key"
-      statefulset.securityContext:
-        fsGroup: 1000
-    asserts:
-      - hasDocuments:
-          count: 1
-      - containsDocument:
-          kind: StatefulSet
-          apiVersion: apps/v1
-          name: gitea-unittests-actions-act-runner
-      - equal:
-          path: spec.template.spec.securityContext["fsGroup"]
-          value: 1000
-  - it: Has fsGroupChangePolicy in securityContext
-    template: templates/statefulset.yaml
-    set:
-      enabled: true
-      existingSecret: "my-secret"
-      existingSecretKey: "my-secret-key"
-      statefulset.securityContext:
-        fsGroupChangePolicy: OnRootMismatch
-    asserts:
-      - hasDocuments:
-          count: 1
-      - containsDocument:
-          kind: StatefulSet
-          apiVersion: apps/v1
-          name: gitea-unittests-actions-act-runner
-      - equal:
-          path: spec.template.spec.securityContext["fsGroupChangePolicy"]
-          value: "OnRootMismatch"
-  - it: Has Always in securityContext
-    template: templates/statefulset.yaml
-    set:
-      enabled: true
-      existingSecret: "my-secret"
-      existingSecretKey: "my-secret-key"
-      statefulset.securityContext:
-        fsGroupChangePolicy: Always
-    asserts:
-      - hasDocuments:
-          count: 1
-      - containsDocument:
-          kind: StatefulSet
-          apiVersion: apps/v1
-          name: gitea-unittests-actions-act-runner
-      - equal:
-          path: spec.template.spec.securityContext["fsGroupChangePolicy"]
-          value: "Always"
-  - it: doesn't renders a StatefulSet by default
-    template: templates/statefulset.yaml
-    asserts:
-      - hasDocuments:
-          count: 0
-  - it: renders a StatefulSet (with given existingSecret/existingSecretKey)
-    template: templates/statefulset.yaml
-    set:
-      enabled: true
-      existingSecret: "my-secret"
-      existingSecretKey: "my-secret-key"
-    asserts:
-      - hasDocuments:
-          count: 1
-      - containsDocument:
-          kind: StatefulSet
-          apiVersion: apps/v1
-          name: gitea-unittests-actions-act-runner
-      - equal:
-          path: spec.template.spec.containers[0].env[0]
-          value:
-            name: GITEA_RUNNER_REGISTRATION_TOKEN
-            valueFrom:
-              secretKeyRef:
-                name: "my-secret"
-                key: "my-secret-key"
-  - it: renders a StatefulSet (with secret reference defaults for enabled provisioning)
-    template: templates/statefulset.yaml
-    set:
-      enabled: true
-      provisioning:
-        enabled: true
-    asserts:
-      - hasDocuments:
-          count: 1
-      - containsDocument:
-          kind: StatefulSet
-          apiVersion: apps/v1
-          name: gitea-unittests-actions-act-runner
-      - equal:
-          path: spec.template.spec.containers[0].env[0]
-          value:
-            name: GITEA_RUNNER_REGISTRATION_TOKEN
-            valueFrom:
-              secretKeyRef:
-                name: "gitea-unittests-actions-token"
-                key: "token"
-  - it: renders a StatefulSet (that tracks changes of the runner configuration as annotation)
-    template: templates/statefulset.yaml
-    set:
-      image.tag: "1.22.3" # lock image tag to prevent test failures on future Gitea upgrades
-      enabled: true
-      existingSecret: "my-secret"
-      existingSecretKey: "my-secret-key"
-    asserts:
-      - hasDocuments:
-          count: 1
-      - containsDocument:
-          kind: StatefulSet
-          apiVersion: apps/v1
-          name: gitea-unittests-actions-act-runner
-      - equal:
-          path: spec.template.metadata.annotations["checksum/config"]
-          value: "2bafbf04b3c4293c8ddf895ae3d908e14176ee54a6c724c8cf5b2a1e43c6ece7"
-  - it: renders a StatefulSet http (with correct GITEA_INSTANCE_URL env from giteaRootURL)
-    template: templates/statefulset.yaml
-    set:
-      giteaRootURL: "http://git.example.com"
-      enabled: true
-      existingSecret: "my-secret"
-      existingSecretKey: "my-secret-key"
-    asserts:
-      - hasDocuments:
-          count: 1
-      - containsDocument:
-          kind: StatefulSet
-          apiVersion: apps/v1
-          name: gitea-unittests-actions-act-runner
-      - equal:
-          path: spec.template.spec.containers[0].env[1]
-          value:
-            name: GITEA_INSTANCE_URL
-            value: "http://git.example.com"
-      - equal:
-          path: spec.template.spec.initContainers[0].command[2]
-          value: |
-            echo 'Trying to reach Gitea on http://git.example.com'
-            until timeout 10 wget --no-check-certificate --spider http://git.example.com; do
-              sleep 3
-              echo "Trying again in 3 seconds..."
-            done
-            echo "Gitea has been reached!"
-  - it: renders a StatefulSet https (with correct GITEA_INSTANCE_URL env from giteaRootURL)
-    template: templates/statefulset.yaml
-    set:
-      giteaRootURL: "https://git.example.com"
-      enabled: true
-      existingSecret: "my-secret"
-      existingSecretKey: "my-secret-key"
-    asserts:
-      - hasDocuments:
-          count: 1
-      - containsDocument:
-          kind: StatefulSet
-          apiVersion: apps/v1
-          name: gitea-unittests-actions-act-runner
-      - equal:
-          path: spec.template.spec.containers[0].env[1]
-          value:
-            name: GITEA_INSTANCE_URL
-            value: "https://git.example.com"
-      - equal:
-          path: spec.template.spec.initContainers[0].command[2]
-          value: |
-            echo 'Trying to reach Gitea on https://git.example.com'
-            until timeout 10 wget --no-check-certificate --spider https://git.example.com; do
-              sleep 3
-              echo "Trying again in 3 seconds..."
-            done
-            echo "Gitea has been reached!"
-  - it: renders a StatefulSet https (with correct GITEA_INSTANCE_URL env from giteaRootURL)
-    template: templates/statefulset.yaml
-    set:
-      giteaRootURL: "https://git.example.com:8443"
-      enabled: true
-      existingSecret: "my-secret"
-      existingSecretKey: "my-secret-key"
-    asserts:
-      - hasDocuments:
-          count: 1
-      - containsDocument:
-          kind: StatefulSet
-          apiVersion: apps/v1
-          name: gitea-unittests-actions-act-runner
-      - equal:
-          path: spec.template.spec.containers[0].env[1]
-          value:
-            name: GITEA_INSTANCE_URL
-            value: "https://git.example.com:8443"
-      - equal:
-          path: spec.template.spec.initContainers[0].command[2]
-          value: |
-            echo 'Trying to reach Gitea on https://git.example.com:8443'
-            until timeout 10 wget --no-check-certificate --spider https://git.example.com:8443; do
-              sleep 3
-              echo "Trying again in 3 seconds..."
-            done
-            echo "Gitea has been reached!"
-  - it: allows adding custom environment variables to the docker-in-docker container
-    template: templates/statefulset.yaml
-    set:
-      enabled: true
-      statefulset:
-        dind:
-          extraEnvs:
-            - name: "CUSTOM_ENV_NAME"
-              value: "custom env value"
-    asserts:
-      - equal:
-          path: spec.template.spec.initContainers[1].env[0]
-          value:
-            name: "CUSTOM_ENV_NAME"
-            value: "custom env value"
+
   - it: should mount an extra volume in the act runner container
     template: templates/statefulset.yaml
     set:
@@ -397,13 +316,67 @@ tests:
       - containsDocument:
           kind: StatefulSet
           apiVersion: apps/v1
-          name: gitea-unittests-actions-act-runner
+          name: gitea-actions-unittests-act-runner
       - contains:
           any: true
           path: spec.template.spec.containers[0].volumeMounts
           content:
             mountPath: /mnt
             name: my-act-runner-volume
+
+#
+## DIND
+#
+
+  - it: dind uses fullOverride
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      statefulset.dind.fullOverride: test.io/dind:x.y.z
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-actions-unittests-act-runner
+      - equal:
+          path: spec.template.spec.initContainers[1].image
+          value: test.io/dind:x.y.z
+
+  - it: dind uses global.imageRegistry
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      global.imageRegistry: test.io
+      statefulset.dind.tag: 28.3.3-dind
+    asserts:
+      - hasDocuments:
+          count: 1
+      - containsDocument:
+          kind: StatefulSet
+          apiVersion: apps/v1
+          name: gitea-actions-unittests-act-runner
+      - equal:
+          path: spec.template.spec.initContainers[1].image
+          value: test.io/docker:28.3.3-dind
+
+  - it: allows adding custom environment variables to the docker-in-docker container
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      statefulset:
+        dind:
+          extraEnvs:
+            - name: "CUSTOM_ENV_NAME"
+              value: "custom env value"
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[1].env[0]
+          value:
+            name: "CUSTOM_ENV_NAME"
+            value: "custom env value"
+
   - it: should mount an extra volume in the docker-in-docker container
     template: templates/statefulset.yaml
     set:
@@ -422,81 +395,47 @@ tests:
       - containsDocument:
           kind: StatefulSet
           apiVersion: apps/v1
-          name: gitea-unittests-actions-act-runner
+          name: gitea-actions-unittests-act-runner
       - contains:
           any: true
           path: spec.template.spec.initContainers[1].volumeMounts
           content:
             mountPath: /mnt
             name: my-dind-volume
-  - it: should interpret existingSecret & existingSecretKey templating
+
+#
+## INIT
+#
+
+  - it: init uses fullOverride
     template: templates/statefulset.yaml
     set:
-      gitea:
-        token:
-          secret:
-            name: "gitea-secret"
-            key: "secret-key"
       enabled: true
-      existingSecret: "{{ .Release.Name }}-{{ .Values.gitea.token.secret.name}}"
-      existingSecretKey: "{{ .Values.gitea.token.secret.key}}"
+      init.image.fullOverride: test.io/busybox:x.y.z
     asserts:
       - hasDocuments:
           count: 1
       - containsDocument:
           kind: StatefulSet
           apiVersion: apps/v1
-          name: gitea-unittests-actions-act-runner
+          name: gitea-actions-unittests-act-runner
       - equal:
-          path: spec.template.spec.containers[0].env[0].name
-          value: "GITEA_RUNNER_REGISTRATION_TOKEN"
-      - equal:
-          path: spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.name
-          value: "gitea-unittests-gitea-secret"
-      - equal:
-          path: spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.key
-          value: "secret-key"
-  - it: should interpret Gitea Root URL templating
+          path: spec.template.spec.initContainers[0].image
+          value: test.io/busybox:x.y.z
+
+  - it: init uses global.imageRegistry
     template: templates/statefulset.yaml
     set:
-      global:
-        gitea:
-          service:
-            name: "my-gitea-svc-http"
-            port: 3210
       enabled: true
-      giteaRootURL: "http://{{ .Values.global.gitea.service.name }}:{{ .Values.global.gitea.service.port }}"
+      global.imageRegistry: test.io
+      init.image.tag: 1.37.0
     asserts:
       - hasDocuments:
           count: 1
       - containsDocument:
           kind: StatefulSet
           apiVersion: apps/v1
-          name: gitea-unittests-actions-act-runner
+          name: gitea-actions-unittests-act-runner
       - equal:
-          path: spec.template.spec.containers[0].env[1].name
-          value: "GITEA_INSTANCE_URL"
-      - equal:
-          path: spec.template.spec.containers[0].env[1].value
-          value: "http://my-gitea-svc-http:3210"
-      - equal:
-          path: spec.template.spec.initContainers[0].command[2]
-          value: |
-            echo 'Trying to reach Gitea on http://my-gitea-svc-http:3210'
-            until timeout 10 wget --no-check-certificate --spider http://my-gitea-svc-http:3210; do
-              sleep 3
-              echo "Trying again in 3 seconds..."
-            done
-            echo "Gitea has been reached!"
-  - it: should render service account name correctly
-    template: templates/statefulset.yaml
-    set:
-      enabled: true
-      statefulset:
-        serviceAccountName: "my-service-account"
-    asserts:
-      - hasDocuments:
-          count: 1
-      - equal:
-          path: spec.template.spec.serviceAccountName
-          value: "my-service-account"
+          path: spec.template.spec.initContainers[0].image
+          value: test.io/busybox:1.37.0

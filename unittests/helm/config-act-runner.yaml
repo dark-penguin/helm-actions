@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
 suite: actions template | config-act-runner
 release:
-  name: gitea-unittests
+  name: gitea-actions-unittests
   namespace: testing
 templates:
   - templates/config-act-runner.yaml
@@ -31,7 +31,7 @@ tests:
       - containsDocument:
           kind: ConfigMap
           apiVersion: v1
-          name: gitea-unittests-actions-act-runner-config
+          name: gitea-actions-unittests-act-runner-config
       - equal:
           path: data["config.yaml"]
           value: |
@@ -59,7 +59,7 @@ tests:
       - containsDocument:
           kind: ConfigMap
           apiVersion: v1
-          name: gitea-unittests-actions-act-runner-config
+          name: gitea-actions-unittests-act-runner-config
       - matchRegex:
           path: data["config.yaml"]
           pattern: '(?m)^\s*options:\s*-v /var/run/docker.sock:/var/run/docker.sock\s*$'
