@@ -45,7 +45,7 @@ Storage Class
 {{- define "gitea.actions.persistence.storageClass" -}}
 {{- $storageClass :=  default (tpl ( default "" .Values.global.storageClass) .) }}
 {{- if $storageClass }}
-  storageClassName: {{ $storageClass | quote }}
+storageClassName: {{ $storageClass | quote }}
 {{- end }}
 {{- end -}}
 

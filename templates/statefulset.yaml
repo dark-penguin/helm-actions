@@ -193,7 +193,7 @@ spec:
         name: data-act-runner
       spec:
         accessModes: [ "ReadWriteOnce" ]
-        {{- include "gitea.actions.persistence.storageClass" . | nindent 8 }}
+        {{- include "gitea.actions.persistence.storageClass" . | indent 8 }}
         resources:
           requests:
             storage: {{ .Values.statefulset.persistence.size }}
