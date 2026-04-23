@@ -46,7 +46,7 @@ Storage Class
 {{- $storageClass :=  default (tpl ( default "" .Values.global.storageClass) .) }}
 {{- if $storageClass }}
 storageClassName: {{ $storageClass | quote }}
-{{- end }}
+{{- end -}}
 {{- end -}}
 
 {{/*

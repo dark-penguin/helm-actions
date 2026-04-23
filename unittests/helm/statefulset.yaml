@@ -211,6 +211,18 @@ tests:
       - equal:
           path: spec.template.spec.runtimeClassName
           value: "my-runtime-class-name"
+  - it: should render storageClass correctly
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      global:
+        storageClass: "test-storageclass"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.volumeClaimTemplates[0].spec.storageClassName
+          value: "test-storageclass"
 
 #
 ## ACT_RUNNER
