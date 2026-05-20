@@ -20,7 +20,7 @@ If release name contains chart name it will be used as a full name.
   {{- if contains $name .Release.Name -}}
     {{- .Release.Name | trunc 63 | trimSuffix "-" -}}
     {{- else -}}
-    {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+    {{- printf "%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
   {{- end -}}
 {{- end -}}
 {{- end -}}
@@ -61,10 +61,10 @@ version: {{ default .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
-{{- define "gitea.actions.labels.actRunner" -}}
+{{- define "gitea.actions.labels.runner" -}}
 helm.sh/chart: {{ include "gitea.actions.chart" . }}
-app: {{ include "gitea.actions.name" . }}-act-runner
-{{ include "gitea.actions.selectorLabels.actRunner" . }}
+app: {{ include "gitea.actions.name" . }}-runner
+{{ include "gitea.actions.selectorLabels.runner" . }}
 app.kubernetes.io/version: {{ default .Chart.AppVersion | quote }}
 version: {{ default .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
@@ -78,8 +78,8 @@ app.kubernetes.io/name: {{ include "gitea.actions.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
-{{- define "gitea.actions.selectorLabels.actRunner" -}}
-app.kubernetes.io/name: {{ include "gitea.actions.name" . }}-act-runner
+{{- define "gitea.actions.selectorLabels.runner" -}}
+app.kubernetes.io/name: {{ include "gitea.actions.name" . }}-runner
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
@@ -112,8 +112,8 @@ Common create image implementation
 {{/*
 Create image for the Gitea Actions Act Runner
 */}}
-{{- define "gitea.actions.actRunner.image" -}}
-{{ include "gitea.actions.common.image" (dict "root" . "image" .Values.statefulset.actRunner) }}
+{{- define "gitea.actions.runner.image" -}}
+{{ include "gitea.actions.common.image" (dict "root" . "image" .Values.statefulset.runner) }}
 {{- end -}}
 
 {{/*

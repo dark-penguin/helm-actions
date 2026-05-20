@@ -1,34 +1,34 @@
 # Configure Gitea Actions
 ## @section Gitea Actions
 #
-## @param enabled Create an act runner StatefulSet.
+## @param enabled Create a Gitea Runner StatefulSet.
 ## @param statefulset.replicas the amount of (replica) runner pods deployed
-## @param statefulset.timezone is the timezone that will be set in the act_runner image
-## @param statefulset.annotations Act runner annotations
-## @param statefulset.labels Act runner labels
-## @param statefulset.resources Act runner resources
+## @param statefulset.timezone is the timezone that will be set in the runner image
+## @param statefulset.annotations Gitea Runner annotations
+## @param statefulset.labels Gitea Runner labels
+## @param statefulset.resources Gitea Runner resources
 ## @param statefulset.nodeSelector NodeSelector for the statefulset
 ## @param statefulset.tolerations Tolerations for the statefulset
 ## @param statefulset.affinity Affinity for the statefulset
 ## @param statefulset.extraVolumes Extra volumes for the statefulset
-## @param statefulset.persistence.size Size for persistence to store act runner data
+## @param statefulset.persistence.size Size for persistence to store Gitea Runner data
 ## @param statefulset.securityContext Customize the SecurityContext
 ## @param statefulset.serviceAccountName Customize the service account name
 ## @param statefulset.runtimeClassName Select a different RuntimeClass for pods
 ## @param statefulset.hostAliases Inject entries into the /etc/hosts file
 #
-## @param statefulset.persistence.size Size for persistence to store act runner data
+## @param statefulset.persistence.size Size for persistence to store Gitea Runner data
 #
-## @param statefulset.actRunner.registry image registry, e.g. gcr.io,docker.io
-## @param statefulset.actRunner.repository The Gitea act runner image
-## @param statefulset.actRunner.tag The Gitea act runner tag
-## @param statefulset.actRunner.digest Image digest. Allows to pin the given image tag. Useful for having control over mutable tags like `latest`
-## @param statefulset.actRunner.pullPolicy The Gitea act runner pullPolicy
-## @param statefulset.actRunner.fullOverride Completely overrides the image registry, path/image, tag and digest.
-## @param statefulset.actRunner.extraVolumeMounts Allows mounting extra volumes in the act runner container
-## @param statefulset.actRunner.extraEnvs Allows adding custom environment variables
-## @param statefulset.actRunner.flushCache whether to clear the .runner (cache) file by creating an extra init container, can slightly increase boot-up time
-## @param statefulset.actRunner.config [default: Too complex. See values.yaml] Act runner custom configuration. See [Act Runner documentation](https://docs.gitea.com/usage/actions/act-runner#configuration) for details.
+## @param statefulset.runner.registry image registry, e.g. gcr.io,docker.io
+## @param statefulset.runner.repository The Gitea Runner image
+## @param statefulset.runner.tag The Gitea Runner tag
+## @param statefulset.runner.digest Image digest. Allows to pin the given image tag. Useful for having control over mutable tags like `latest`
+## @param statefulset.runner.pullPolicy The Gitea Runner pullPolicy
+## @param statefulset.runner.fullOverride Completely overrides the image registry, path/image, tag and digest.
+## @param statefulset.runner.extraVolumeMounts Allows mounting extra volumes in the Gitea Runner container
+## @param statefulset.runner.extraEnvs Allows adding custom environment variables
+## @param statefulset.runner.flushCache whether to clear the .runner (cache) file by creating an extra init container, can slightly increase boot-up time
+## @param statefulset.runner.config [default: Too complex. See values.yaml] Gitea Runner custom configuration. See [Gitea Runner documentation](https://docs.gitea.com/usage/actions/act-runner#configuration) for details.
 #
 ## @param statefulset.dind.rootless [default: false] a simple flag to let helm know we are dealing with a rootless dind container
 ## @param statefulset.dind.uid a field to set the running user id for the rootless dind container, so it knows where to look for the socket
@@ -68,10 +68,10 @@ statefulset:
   persistence:
     size: 1Gi
 
-  actRunner:
+  runner:
     registry: "docker.gitea.com"
-    repository: act_runner
-    tag: 0.4.1
+    repository: runner
+    tag: 1.0.4
     digest: ""
     pullPolicy: IfNotPresent
     fullOverride: ""
@@ -85,7 +85,7 @@ statefulset:
 
     # See full details: https://gitea.com/gitea/helm-actions/issues/73
     flushCache: false
-    # See full example here: https://gitea.com/gitea/act_runner/src/branch/main/internal/pkg/config/config.example.yaml
+    # See full example here: https://gitea.com/gitea/runner/src/branch/main/internal/pkg/config/config.example.yaml
     config: |
       log:
         level: debug
@@ -100,7 +100,7 @@ statefulset:
     uid: ""
     registry: "docker.io"
     repository: docker
-    tag: 29.4.0-dind
+    tag: 29.5.1-dind
     digest: ""
     pullPolicy: IfNotPresent
     fullOverride: ""
@@ -146,7 +146,7 @@ existingSecretKey: ""
 
 ## @section Gitea URL Setting
 #
-## @param giteaRootURL URL the act_runner registers and connect with
+## @param giteaRootURL URL the Gitea Runner registers and connects with
 giteaRootURL: ""
 
 ## @section Extra Init Containers

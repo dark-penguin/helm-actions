@@ -5,7 +5,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   labels:
-    {{- include "gitea.actions.labels.actRunner" . | nindent 4 }}
+    {{- include "gitea.actions.labels.runner" . | nindent 4 }}
     {{- with .Values.statefulset.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -13,19 +13,19 @@ metadata:
     {{- with .Values.statefulset.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-  name: {{ include "gitea.actions.fullname" . }}-act-runner
+  name: {{ include "gitea.actions.fullname" . }}-runner
   namespace: {{ .Values.namespace | default .Release.Namespace }}
 spec:
   replicas: {{ .Values.statefulset.replicas | default 1 }}
   selector:
     matchLabels:
-      {{- include "gitea.actions.selectorLabels.actRunner" . | nindent 6 }}
+      {{- include "gitea.actions.selectorLabels.runner" . | nindent 6 }}
   template:
     metadata:
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/config-act-runner.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
       labels:
-        {{- include "gitea.actions.labels.actRunner" . | nindent 8 }}
+        {{- include "gitea.actions.labels.runner" . | nindent 8 }}
         {{- with .Values.statefulset.labels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -49,7 +49,7 @@ spec:
         {{- if .Values.preExtraInitContainers }}
         {{- toYaml .Values.preExtraInitContainers | nindent 8 }}
         {{- end }}
-        {{- if .Values.statefulset.actRunner.flushCache }}
+        {{- if .Values.statefulset.runner.flushCache }}
         - name: cache-flusher
           image: "{{ include "gitea.actions.init.image" . }}"
           command:
@@ -64,7 +64,7 @@ spec:
               fi
           volumeMounts:
             - mountPath: /data
-              name: data-act-runner
+              name: data-runner
         {{- end }}
         - name: init-gitea
           image: "{{ include "gitea.actions.init.image" . }}"
@@ -128,9 +128,9 @@ spec:
         {{- toYaml .Values.postExtraInitContainers | nindent 8 }}
         {{- end }}
       containers:
-        - name: act-runner
-          image: "{{ include "gitea.actions.actRunner.image" . }}"
-          imagePullPolicy: {{ .Values.statefulset.actRunner.pullPolicy }}
+        - name: runner
+          image: "{{ include "gitea.actions.runner.image" . }}"
+          imagePullPolicy: {{ .Values.statefulset.runner.pullPolicy }}
           workingDir: /data
           env:
             - name: GITEA_RUNNER_REGISTRATION_TOKEN
@@ -141,24 +141,24 @@ spec:
             - name: GITEA_INSTANCE_URL
               value: {{ include "gitea.actions.local_root_url" . }}
             - name: CONFIG_FILE
-              value: /actrunner/config.yaml
+              value: /runner/config.yaml
             - name: TZ
               value: {{ .Values.statefulset.timezone | default "Etc/UTC" }}
-            {{- if .Values.statefulset.actRunner.extraEnvs }}
-            {{- toYaml .Values.statefulset.actRunner.extraEnvs | nindent 12 }}
+            {{- if .Values.statefulset.runner.extraEnvs }}
+            {{- toYaml .Values.statefulset.runner.extraEnvs | nindent 12 }}
             {{- end }}
           resources:
             {{- toYaml .Values.statefulset.resources | nindent 12 }}
           volumeMounts:
-            - mountPath: /actrunner/config.yaml
-              name: act-runner-config
+            - mountPath: /runner/config.yaml
+              name: runner-config
               subPath: config.yaml
             - mountPath: /var/run/docker.sock
               name: docker-socket
               subPath: docker.sock
             - mountPath: /data
-              name: data-act-runner
-            {{- with .Values.statefulset.actRunner.extraVolumeMounts }}
+              name: data-runner
+            {{- with .Values.statefulset.runner.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
       {{- if .Values.global.imagePullSecrets }}
@@ -180,9 +180,9 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
-        - name: act-runner-config
+        - name: runner-config
           configMap:
-            name: {{ include "gitea.actions.fullname" . }}-act-runner-config
+            name: {{ include "gitea.actions.fullname" . }}-runner-configmap
         - name: docker-socket
           emptyDir: {}
         {{- with .Values.statefulset.extraVolumes }}
@@ -190,7 +190,7 @@ spec:
         {{- end }}
   volumeClaimTemplates:
     - metadata:
-        name: data-act-runner
+        name: data-runner
       spec:
         accessModes: [ "ReadWriteOnce" ]
         {{- include "gitea.actions.persistence.storageClass" . | indent 8 }}

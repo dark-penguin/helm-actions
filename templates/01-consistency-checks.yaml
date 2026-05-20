@@ -1,5 +1,4 @@
 {{- if .Values.enabled -}}
-
     {{- if or (empty .Values.existingSecret) (empty .Values.existingSecretKey) -}}
         {{- fail "existingSecret and existingSecretKey are required when provisioning is disabled" -}}
     {{- end -}}

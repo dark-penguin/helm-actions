@@ -1,22 +1,22 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
-suite: actions template | config-act-runner
+suite: actions template | configmap
 release:
   name: gitea-actions-unittests
   namespace: testing
 templates:
-  - templates/config-act-runner.yaml
+  - templates/configmap.yaml
 tests:
   - it: doesn't renders a ConfigMap by default
-    template: templates/config-act-runner.yaml
+    template: templates/configmap.yaml
     asserts:
       - hasDocuments:
           count: 0
   - it: renders a ConfigMap
-    template: templates/config-act-runner.yaml
+    template: templates/configmap.yaml
     set:
       enabled: true
       statefulset:
-        actRunner:
+        runner:
           config: |
             log:
               level: info
@@ -31,7 +31,7 @@ tests:
       - containsDocument:
           kind: ConfigMap
           apiVersion: v1
-          name: gitea-actions-unittests-act-runner-config
+          name: gitea-actions-unittests-runner-configmap
       - equal:
           path: data["config.yaml"]
           value: |
@@ -43,11 +43,11 @@ tests:
               labels:
                 - "ubuntu-latest"
   - it: renders a ConfigMap with inline yaml
-    template: templates/config-act-runner.yaml
+    template: templates/configmap.yaml
     set:
       enabled: true
       statefulset:
-        actRunner:
+        runner:
           config: |
             container:
               valid_volumes:
@@ -59,7 +59,7 @@ tests:
       - containsDocument:
           kind: ConfigMap
           apiVersion: v1
-          name: gitea-actions-unittests-act-runner-config
+          name: gitea-actions-unittests-runner-configmap
       - matchRegex:
           path: data["config.yaml"]
           pattern: '(?m)^\s*options:\s*-v /var/run/docker.sock:/var/run/docker.sock\s*$'
