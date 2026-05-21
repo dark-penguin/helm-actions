@@ -56,7 +56,7 @@ jobs:
           # Package the chart
           mkdir ./actions
           helm dependency build
-          helm package --version "${GITHUB_REF#refs/tags/v}" --destionation ./actions ./
+          helm package --version "${GITHUB_REF#refs/tags/v}" --destination ./actions ./
           curl -s -L -o actions/index.yaml https://dl.gitea.com/charts/index.yaml
           helm repo index actions/ --url https://dl.gitea.com/charts --merge actions/index.yaml
 

@@ -30,7 +30,7 @@ tests:
           name: gitea-actions-unittests-runner
       - equal:
           path: spec.template.metadata.annotations["checksum/config"]
-          value: "b1dcfbe4aaba3dff467bdff776855cea97ded4106ab8030a38a719c47583f4b1"
+          value: "83e4d1bb70cc2a861cd18fdb42537e700d4055d431713e64e28c3874c5660097"
 
   - it: Has fsGroup in securityContext
     template: templates/statefulset.yaml
