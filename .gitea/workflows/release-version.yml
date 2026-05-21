@@ -52,12 +52,11 @@ jobs:
         run: |
           # Install Helm GPG plugin
           helm plugin install https://github.com/technosophos/helm-gpg.git --verify=false
-          helm dependency build
-          helm package --version "${GITHUB_REF#refs/tags/v}" ./
 
           # Package the chart
-          mkdir actions
-          mv actions*.tgz actions/
+          mkdir ./actions
+          helm dependency build
+          helm package --version "${GITHUB_REF#refs/tags/v}" --destionation ./actions ./
           curl -s -L -o actions/index.yaml https://dl.gitea.com/charts/index.yaml
           helm repo index actions/ --url https://dl.gitea.com/charts --merge actions/index.yaml
 
