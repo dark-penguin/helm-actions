@@ -71,7 +71,7 @@ statefulset:
   runner:
     registry: "docker.gitea.com"
     repository: runner
-    tag: 1.0.5
+    tag: 1.0.6
     digest: ""
     pullPolicy: IfNotPresent
     fullOverride: ""
