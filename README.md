@@ -101,7 +101,7 @@ If `.Values.statefulset.dind.rootless: true` is set, then the following will be 
 | ------------------------- | ---------------------------------------------------------------------------------------------------------- | -------------- |
 | `init.image.registry`     | image registry, e.g. gcr.io,docker.io                                                                      | `""`           |
 | `init.image.repository`   | The init image                                                                                             | `busybox`      |
-| `init.image.tag`          | the init image tag                                                                                         | `1.37.0`       |
+| `init.image.tag`          | the init image tag                                                                                         | `1.38.0`       |
 | `init.image.digest`       | Image digest. Allows to pin the given image tag. Useful for having control over mutable tags like `latest` | `""`           |
 | `init.image.pullPolicy`   | The init image pullPolicy                                                                                  | `IfNotPresent` |
 | `init.image.fullOverride` | Completely overrides the image registry, path/image, tag and digest.                                       | `""`           |

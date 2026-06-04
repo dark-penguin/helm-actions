@@ -132,7 +132,7 @@ init:
     registry: ""
     repository: busybox
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "1.37.0"
+    tag: "1.38.0"
     digest: ""
     pullPolicy: IfNotPresent
     fullOverride: ""
