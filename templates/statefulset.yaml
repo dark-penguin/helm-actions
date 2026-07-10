@@ -66,14 +66,21 @@ spec:
             - mountPath: /data
               name: data-runner
         {{- end }}
-        - name: init-gitea
+        - name: reach-gitea
           image: "{{ include "gitea.actions.init.image" . }}"
           command:
             - sh
             - -c
             - |
+              {{- if .Values.init.preConnectionCommandOverride }}
+              {{ .Values.init.preConnectionCommandOverride }}
+              {{- end }}
               echo 'Trying to reach Gitea on {{ include "gitea.actions.local_root_url" . }}'
+              {{- if .Values.init.connectionCommandOverride }}
+              until timeout 10 {{ .Values.init.connectionCommandOverride }} {{ include "gitea.actions.local_root_url" . }}; do
+              {{- else }}
               until timeout 10 wget --no-check-certificate --spider {{ include "gitea.actions.local_root_url" . }}; do
+              {{- end }}
                 sleep 3
                 echo "Trying again in 3 seconds..."
               done

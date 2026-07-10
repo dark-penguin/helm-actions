@@ -121,12 +121,15 @@ statefulset:
 
 ## @section Gitea Actions Init
 #
-## @param init.image.registry image registry, e.g. gcr.io,docker.io
-## @param init.image.repository The init image
-## @param init.image.tag the init image tag
+## @param init.image.registry Image registry, e.g. gcr.io,docker.io
+## @param init.image.repository The init image (default: busyboxy but can be changed to alpine e.g.)
+## @param init.image.tag The init image tag
 ## @param init.image.digest Image digest. Allows to pin the given image tag. Useful for having control over mutable tags like `latest`
 ## @param init.image.pullPolicy The init image pullPolicy
-## @param init.image.fullOverride Completely overrides the image registry, path/image, tag and digest.
+## @param init.image.fullOverride Completely overrides the image registry, path/image, tag and digest
+#
+## @param init.connectionCommandOverride Possiblity to change the command with which the container tests its connection to the Gitea server
+## @param init.preConnectionCommandOverride Possibility to add commands that happen before the connection test loop
 init:
   image:
     registry: ""
@@ -136,6 +139,9 @@ init:
     digest: ""
     pullPolicy: IfNotPresent
     fullOverride: ""
+
+  connectionCommandOverride: ""
+  preConnectionCommandOverride: ""
 
 ## @section Runner Token Secret Configuration
 #

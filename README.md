@@ -29,6 +29,16 @@ Deploy with your values, make sure the path is correct:
 helm upgrade --install gitea-actions gitea-charts/actions -f values.yaml
 ```
 
+Alternatively:
+
+```sh
+helm upgrade --install gitea-actions gitea-charts/actions \
+  --set enabled=true \
+  --set giteaRootURL=https://gitea.com \
+  --set existingSecret=foo \
+  --set existingSecretKey=bar
+```
+
 You should be good to go!
 
 ### Runner Token Secret Template
@@ -97,14 +107,16 @@ If `.Values.statefulset.dind.rootless: true` is set, then the following will be 
 
 ### Gitea Actions Init
 
-| Name                      | Description                                                                                                | Value          |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------- | -------------- |
-| `init.image.registry`     | image registry, e.g. gcr.io,docker.io                                                                      | `""`           |
-| `init.image.repository`   | The init image                                                                                             | `busybox`      |
-| `init.image.tag`          | the init image tag                                                                                         | `1.38.0`       |
-| `init.image.digest`       | Image digest. Allows to pin the given image tag. Useful for having control over mutable tags like `latest` | `""`           |
-| `init.image.pullPolicy`   | The init image pullPolicy                                                                                  | `IfNotPresent` |
-| `init.image.fullOverride` | Completely overrides the image registry, path/image, tag and digest.                                       | `""`           |
+| Name                                | Description                                                                                                | Value          |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------- | -------------- |
+| `init.image.registry`               | Image registry, e.g. gcr.io,docker.io                                                                      | `""`           |
+| `init.image.repository`             | The init image (default: busyboxy but can be changed to alpine e.g.)                                       | `busybox`      |
+| `init.image.tag`                    | The init image tag                                                                                         | `1.38.0`       |
+| `init.image.digest`                 | Image digest. Allows to pin the given image tag. Useful for having control over mutable tags like `latest` | `""`           |
+| `init.image.pullPolicy`             | The init image pullPolicy                                                                                  | `IfNotPresent` |
+| `init.image.fullOverride`           | Completely overrides the image registry, path/image, tag and digest                                        | `""`           |
+| `init.connectionCommandOverride`    | Possiblity to change the command with which the container tests its connection to the Gitea server         | `""`           |
+| `init.preConnectionCommandOverride` | Possibility to add commands that happen before the connection test loop                                    | `""`           |
 
 ### Runner Token Secret Configuration
 
