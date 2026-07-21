@@ -120,7 +120,7 @@ spec:
                 - /var/run/docker.sock
                 {{- end }}
           resources:
-            {{- toYaml .Values.statefulset.resources | nindent 12 }}
+            {{- include "gitea.actions.dind.resources" . | nindent 12 }}
           volumeMounts:
             {{- if .Values.statefulset.dind.rootless }}
             - mountPath: /run/user/{{ .Values.statefulset.dind.uid | default 1000 }}/
@@ -155,7 +155,7 @@ spec:
             {{- toYaml .Values.statefulset.runner.extraEnvs | nindent 12 }}
             {{- end }}
           resources:
-            {{- toYaml .Values.statefulset.resources | nindent 12 }}
+            {{- include "gitea.actions.runner.resources" . | nindent 12 }}
           volumeMounts:
             - mountPath: /runner/config.yaml
               name: runner-config

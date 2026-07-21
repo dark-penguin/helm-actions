@@ -1,12 +1,15 @@
 # Configure Gitea Actions
 ## @section Gitea Actions
+## @descriptionStart
+## For resource limit examples (runner vs DinD), see [docs/resources.md](./docs/resources.md).
+## @descriptionEnd
 #
 ## @param enabled Create a Gitea Runner StatefulSet.
 ## @param statefulset.replicas the amount of (replica) runner pods deployed
 ## @param statefulset.timezone is the timezone that will be set in the runner image
 ## @param statefulset.annotations Gitea Runner annotations
 ## @param statefulset.labels Gitea Runner labels
-## @param statefulset.resources Gitea Runner resources
+## @param statefulset.resources Shared resource requests/limits for both containers. Overridden by statefulset.runner.resources and statefulset.dind.resources. See docs/resources.md.
 ## @param statefulset.nodeSelector NodeSelector for the statefulset
 ## @param statefulset.tolerations Tolerations for the statefulset
 ## @param statefulset.affinity Affinity for the statefulset
@@ -25,6 +28,7 @@
 ## @param statefulset.runner.digest Image digest. Allows to pin the given image tag. Useful for having control over mutable tags like `latest`
 ## @param statefulset.runner.pullPolicy The Gitea Runner pullPolicy
 ## @param statefulset.runner.fullOverride Completely overrides the image registry, path/image, tag and digest.
+## @param statefulset.runner.resources Resource requests/limits for the runner container. Takes precedence over statefulset.resources when set.
 ## @param statefulset.runner.extraVolumeMounts Allows mounting extra volumes in the Gitea Runner container
 ## @param statefulset.runner.extraEnvs Allows adding custom environment variables
 ## @param statefulset.runner.flushCache whether to clear the .runner (cache) file by creating an extra init container, can slightly increase boot-up time
@@ -38,6 +42,7 @@
 ## @param statefulset.dind.digest Image digest. Allows to pin the given image tag. Useful for having control over mutable tags like `latest`
 ## @param statefulset.dind.fullOverride Completely overrides the image registry, path/image, tag and digest.
 ## @param statefulset.dind.pullPolicy The Docker-in-Docker pullPolicy
+## @param statefulset.dind.resources Resource requests/limits for the DinD sidecar container. Takes precedence over statefulset.resources when set.
 ## @param statefulset.dind.extraVolumeMounts Allows mounting extra volumes in the Docker-in-Docker container
 ## @param statefulset.dind.extraEnvs Allows adding custom environment variables, such as `DOCKER_IPTABLES_LEGACY`
 ## @param statefulset.dind.extraArgs Allows adding custom arguments to the Docker Daemon
@@ -75,6 +80,7 @@ statefulset:
     digest: ""
     pullPolicy: IfNotPresent
     fullOverride: ""
+    resources: {}
     extraVolumeMounts: []
     extraEnvs:
       []
@@ -104,6 +110,7 @@ statefulset:
     digest: ""
     pullPolicy: IfNotPresent
     fullOverride: ""
+    resources: {}
     extraVolumeMounts: []
 
     # If the container keeps crashing in your environment, you might have to add the `DOCKER_IPTABLES_LEGACY` environment variable.

@@ -451,3 +451,85 @@ tests:
       - equal:
           path: spec.template.spec.initContainers[0].image
           value: test.io/busybox:1.37.0
+
+#
+## RESOURCES
+#
+
+  - it: shared statefulset.resources applies to both runner and dind containers
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      statefulset.resources:
+        requests:
+          memory: "512Mi"
+          cpu: "250m"
+        limits:
+          memory: "1Gi"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.template.spec.containers[0].resources
+          value:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+      - equal:
+          path: spec.template.spec.initContainers[1].resources
+          value:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+
+  - it: statefulset.runner.resources overrides shared resources for runner container only
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      statefulset.resources:
+        requests:
+          memory: "512Mi"
+      statefulset.runner.resources:
+        requests:
+          memory: "256Mi"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.template.spec.containers[0].resources
+          value:
+            requests:
+              memory: "256Mi"
+      - equal:
+          path: spec.template.spec.initContainers[1].resources
+          value:
+            requests:
+              memory: "512Mi"
+
+  - it: statefulset.dind.resources overrides shared resources for dind container only
+    template: templates/statefulset.yaml
+    set:
+      enabled: true
+      statefulset.resources:
+        requests:
+          memory: "512Mi"
+      statefulset.dind.resources:
+        requests:
+          memory: "4Gi"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.template.spec.containers[0].resources
+          value:
+            requests:
+              memory: "512Mi"
+      - equal:
+          path: spec.template.spec.initContainers[1].resources
+          value:
+            requests:
+              memory: "4Gi"

@@ -117,10 +117,24 @@ Create image for the Gitea Actions Act Runner
 {{- end -}}
 
 {{/*
+Resolve resource requests/limits for the runner container.
+*/}}
+{{- define "gitea.actions.runner.resources" -}}
+{{- toYaml (default .Values.statefulset.resources .Values.statefulset.runner.resources) -}}
+{{- end -}}
+
+{{/*
 Create image for DinD
 */}}
 {{- define "gitea.actions.dind.image" -}}
 {{ include "gitea.actions.common.image" (dict "root" . "image" .Values.statefulset.dind) }}
+{{- end -}}
+
+{{/*
+Resolve resource requests/limits for the DinD container.
+*/}}
+{{- define "gitea.actions.dind.resources" -}}
+{{- toYaml (default .Values.statefulset.resources .Values.statefulset.dind.resources) -}}
 {{- end -}}
 
 {{/*
