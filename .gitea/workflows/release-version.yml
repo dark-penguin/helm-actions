@@ -7,7 +7,7 @@ on:
 
 env:
   # renovate: datasource=docker depName=alpine/helm
-  HELM_VERSION: "4.2.2"
+  HELM_VERSION: "4.2.3"
 
 jobs:
   generate-chart-publish:
