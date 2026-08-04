@@ -13,14 +13,14 @@ jobs:
   generate-chart-publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: install Docker CLI
-        uses: https://github.com/docker/setup-buildx-action@v4 # Gitea
+        uses: https://github.com/docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4 # Gitea
         #uses: docker/setup-buildx-action@v4 # Github / Act
 
       - name: install Helm
-        uses: https://github.com/Azure/setup-helm@v5 # Gitea
+        uses: https://github.com/Azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5 # Gitea
         #uses: Azure/setup-helm@v5 # Github / Act
         with:
           version: "${{ env.HELM_VERSION }}"
@@ -33,7 +33,7 @@ jobs:
 
       - name: import GPG key
         id: import_gpg
-        uses: https://github.com/crazy-max/ghaction-import-gpg@v7 # Gitea
+        uses: https://github.com/crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd # v7 # Gitea
         #uses: crazy-max/ghaction-import-gpg@v7 # Github / Act
         with:
           gpg_private_key: ${{ secrets.GPGSIGN_KEY }}
@@ -41,7 +41,7 @@ jobs:
           fingerprint: CC64B1DB67ABBEECAB24B6455FC346329753F4B0
 
       - name: log into Docker Hub
-        uses: https://github.com/docker/login-action@v4 # Gitea
+        uses: https://github.com/docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4 # Gitea
         #uses: docker/login-action@v4 # Github / Act
         with:
           username: ${{ secrets.DOCKER_CHARTS_USERNAME }}
@@ -68,7 +68,7 @@ jobs:
           TAR_OPTIONS: "--wildcards"
 
       - name: aws credential configure
-        uses: https://github.com/aws-actions/configure-aws-credentials@v6 # Gitea
+        uses: https://github.com/aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6 # Gitea
         #uses: aws-actions/configure-aws-credentials@v6 # Github / Act
         with:
           aws-access-key-id: ${{ secrets.AWS_KEY_ID }}

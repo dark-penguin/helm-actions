@@ -23,10 +23,10 @@ jobs:
           apk update
           apk add --update bash make nodejs npm yamllint ncurses
       - name: Install pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
         with:
           version: 11
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: install chart dependencies
         run: helm dependency build
       - name: lint
@@ -49,4 +49,4 @@ jobs:
           git diff --exit-code --name-only README.md
       - name: yaml lint
         # uses: ibiqlik/action-yamllint@v3 # Github / Act
-        uses: https://github.com/ibiqlik/action-yamllint@v3 # Gitea
+        uses: https://github.com/ibiqlik/action-yamllint@2576378a8e339169678f9939646ee3ee325e845c # v3 # Gitea
