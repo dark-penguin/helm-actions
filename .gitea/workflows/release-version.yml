@@ -70,19 +70,6 @@ jobs:
         env:
           TAR_OPTIONS: "--wildcards"
 
-      - name: aws credential configure
-        uses: https://github.com/aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6 # Gitea
-        #uses: aws-actions/configure-aws-credentials@v6 # Github / Act
-        with:
-          aws-access-key-id: ${{ secrets.AWS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: copy files to S3 and clear cache
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          aws s3 sync actions/ s3://${{ secrets.AWS_S3_BUCKET}}/charts/
-
       - name: Copy files to Cloudflare R2
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_R2_ACCESS_KEY_ID }}
