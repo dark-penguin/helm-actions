@@ -48,7 +48,7 @@ jobs:
           password: ${{ secrets.DOCKER_CHARTS_PASSWORD }}
 
       - name: Add Artifacthub.io annotations
-        uses: volker-raschek/ah-annotations@f99244b6ac37658456b9833d02d34886b67a07fe # v0.2.1
+        uses: volker-raschek/ah-annotations@7959e52208294befed11210aef0c8e9299cc6a23 # v0.2.2
 
       # Using helm gpg plugin as 'helm package --sign' has issues with gpg2: https://github.com/helm/helm/issues/2843
       - name: package chart
