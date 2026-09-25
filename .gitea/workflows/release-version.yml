@@ -7,7 +7,7 @@ on:
 
 env:
   # renovate: datasource=docker depName=alpine/helm
-  HELM_VERSION: "4.2.4"
+  HELM_VERSION: "4.3.0"
 
 jobs:
   generate-chart-publish:
@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: install Docker CLI
-        uses: https://github.com/docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4 # Gitea
+        uses: https://github.com/docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4 # Gitea
         #uses: docker/setup-buildx-action@v4 # Github / Act
 
       - name: install Helm
@@ -48,7 +48,7 @@ jobs:
           password: ${{ secrets.DOCKER_CHARTS_PASSWORD }}
 
       - name: Add Artifacthub.io annotations
-        uses: volker-raschek/ah-annotations@7959e52208294befed11210aef0c8e9299cc6a23 # v0.2.2
+        uses: volker-raschek/ah-annotations@db3cdb4828f664cd195bf4fd660aaa6f4959234c # v0.2.3
 
       # Using helm gpg plugin as 'helm package --sign' has issues with gpg2: https://github.com/helm/helm/issues/2843
       - name: package chart

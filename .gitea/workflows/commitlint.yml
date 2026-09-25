@@ -11,7 +11,7 @@ on:
 jobs:
   check-and-test:
     runs-on: ubuntu-latest
-    container: commitlint/commitlint:21.2.2
+    container: commitlint/commitlint:21.2.3
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: check PR title
