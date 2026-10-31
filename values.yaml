@@ -5,6 +5,8 @@
 ## @descriptionEnd
 #
 ## @param enabled Create a Gitea Runner StatefulSet.
+## @param serviceAccount.create Create a service account for the runner. Uses statefulset.serviceAccountName or a generated name.
+## @param rbac.create Create namespace-scoped permissions for Kubernetes job pods. Requires a created or explicitly named service account.
 ## @param statefulset.replicas the amount of (replica) runner pods deployed
 ## @param statefulset.timezone is the timezone that will be set in the runner image
 ## @param statefulset.annotations Gitea Runner annotations
@@ -16,7 +18,7 @@
 ## @param statefulset.extraVolumes Extra volumes for the statefulset
 ## @param statefulset.persistence.size Size for persistence to store Gitea Runner data
 ## @param statefulset.securityContext Customize the SecurityContext
-## @param statefulset.serviceAccountName Customize the service account name
+## @param statefulset.serviceAccountName Name of the runner service account. When serviceAccount.create is false, the account must already exist.
 ## @param statefulset.runtimeClassName Select a different RuntimeClass for pods
 ## @param statefulset.hostAliases Inject entries into the /etc/hosts file
 #
@@ -34,6 +36,7 @@
 ## @param statefulset.runner.flushCache whether to clear the .runner (cache) file by creating an extra init container, can slightly increase boot-up time
 ## @param statefulset.runner.config [default: Too complex. See values.yaml] Gitea Runner custom configuration. See [Gitea Runner documentation](https://docs.gitea.com/usage/actions/act-runner#configuration) for details.
 #
+## @param statefulset.dind.enabled Deploy the Docker-in-Docker sidecar and mount its socket in the runner. Disable for Kubernetes-only runners.
 ## @param statefulset.dind.rootless [default: false] a simple flag to let helm know we are dealing with a rootless dind container
 ## @param statefulset.dind.uid a field to set the running user id for the rootless dind container, so it knows where to look for the socket
 ## @param statefulset.dind.registry image registry, e.g. gcr.io,docker.io
@@ -48,6 +51,10 @@
 ## @param statefulset.dind.extraArgs Allows adding custom arguments to the Docker Daemon
 #
 enabled: false
+serviceAccount:
+  create: false
+rbac:
+  create: false
 statefulset:
   replicas: 1
   timezone: Etc/UTC
@@ -102,6 +109,7 @@ statefulset:
         docker_timeout: 300s
 
   dind:
+    enabled: true
     rootless: false
     uid: ""
     registry: "docker.io"

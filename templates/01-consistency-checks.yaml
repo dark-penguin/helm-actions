@@ -2,6 +2,9 @@
     {{- if or (empty .Values.existingSecret) (empty .Values.existingSecretKey) -}}
         {{- fail "existingSecret and existingSecretKey are required when provisioning is disabled" -}}
     {{- end -}}
+    {{- if and (.Values.rbac | default dict).create (not (.Values.serviceAccount | default dict).create) (empty .Values.statefulset.serviceAccountName) -}}
+        {{- fail "rbac.create requires serviceAccount.create or statefulset.serviceAccountName" -}}
+    {{- end -}}
     {{- if not .Values.giteaRootURL -}}
         {{- fail "giteaRootURL is required" -}}
     {{- end -}}

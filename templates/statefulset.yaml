@@ -31,8 +31,8 @@ spec:
         {{- end }}
     spec:
       restartPolicy: Always
-      {{- if .Values.statefulset.serviceAccountName }}
-      serviceAccountName: {{ .Values.statefulset.serviceAccountName | quote }}
+      {{- if or (.Values.serviceAccount | default dict).create .Values.statefulset.serviceAccountName }}
+      serviceAccountName: {{ include "gitea.actions.serviceAccountName" . | quote }}
       {{- end }}
       {{- if .Values.statefulset.securityContext }}
       securityContext:
@@ -85,6 +85,7 @@ spec:
                 echo "Trying again in 3 seconds..."
               done
               echo "Gitea has been reached!"
+        {{- if ne .Values.statefulset.dind.enabled false }}
         - name: dind
           image: "{{ include "gitea.actions.dind.image" . }}"
           restartPolicy: Always
@@ -131,6 +132,7 @@ spec:
             {{- with .Values.statefulset.dind.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+        {{- end }}
         {{- if .Values.postExtraInitContainers }}
         {{- toYaml .Values.postExtraInitContainers | nindent 8 }}
         {{- end }}
@@ -160,9 +162,11 @@ spec:
             - mountPath: /runner/config.yaml
               name: runner-config
               subPath: config.yaml
+            {{- if ne .Values.statefulset.dind.enabled false }}
             - mountPath: /var/run/docker.sock
               name: docker-socket
               subPath: docker.sock
+            {{- end }}
             - mountPath: /data
               name: data-runner
             {{- with .Values.statefulset.runner.extraVolumeMounts }}
@@ -190,8 +194,10 @@ spec:
         - name: runner-config
           configMap:
             name: {{ include "gitea.actions.fullname" . }}-runner-configmap
+        {{- if ne .Values.statefulset.dind.enabled false }}
         - name: docker-socket
           emptyDir: {}
+        {{- end }}
         {{- with .Values.statefulset.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

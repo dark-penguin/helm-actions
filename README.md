@@ -56,6 +56,10 @@ stringData:
     runner-token: "my-cool-runner-token-given-by-gitea"
 ```
 
+### Native Kubernetes jobs
+
+The default backend uses Docker-in-Docker. To run each job as a Kubernetes pod, see the [Kubernetes configuration guide](./docs/kubernetes.md).
+
 ### Rootless Options
 
 If `.Values.statefulset.dind.rootless: true` is set, then the following will be required:  
@@ -70,6 +74,8 @@ For resource limit examples (runner vs DinD), see [docs/resources.md](./docs/res
 | Name                                   | Description                                                                                                                                            | Value                          |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------ |
 | `enabled`                              | Create a Gitea Runner StatefulSet.                                                                                                                     | `false`                        |
+| `serviceAccount.create`                | Create a service account for the runner. Uses statefulset.serviceAccountName or a generated name.                                                      | `false`                        |
+| `rbac.create`                          | Create namespace-scoped permissions for Kubernetes job pods. Requires a created or explicitly named service account.                                   | `false`                        |
 | `statefulset.replicas`                 | the amount of (replica) runner pods deployed                                                                                                           | `1`                            |
 | `statefulset.timezone`                 | is the timezone that will be set in the runner image                                                                                                   | `Etc/UTC`                      |
 | `statefulset.annotations`              | Gitea Runner annotations                                                                                                                               | `{}`                           |
@@ -81,13 +87,13 @@ For resource limit examples (runner vs DinD), see [docs/resources.md](./docs/res
 | `statefulset.extraVolumes`             | Extra volumes for the statefulset                                                                                                                      | `[]`                           |
 | `statefulset.persistence.size`         | Size for persistence to store Gitea Runner data                                                                                                        | `1Gi`                          |
 | `statefulset.securityContext`          | Customize the SecurityContext                                                                                                                          | `{}`                           |
-| `statefulset.serviceAccountName`       | Customize the service account name                                                                                                                     | `""`                           |
+| `statefulset.serviceAccountName`       | Name of the runner service account. When serviceAccount.create is false, the account must already exist.                                               | `""`                           |
 | `statefulset.runtimeClassName`         | Select a different RuntimeClass for pods                                                                                                               | `""`                           |
 | `statefulset.hostAliases`              | Inject entries into the /etc/hosts file                                                                                                                | `[]`                           |
 | `statefulset.persistence.size`         | Size for persistence to store Gitea Runner data                                                                                                        | `1Gi`                          |
 | `statefulset.runner.registry`          | image registry, e.g. gcr.io,docker.io                                                                                                                  | `docker.gitea.com`             |
 | `statefulset.runner.repository`        | The Gitea Runner image                                                                                                                                 | `runner`                       |
-| `statefulset.runner.tag`               | The Gitea Runner tag                                                                                                                                   | `3.0.2`                        |
+| `statefulset.runner.tag`               | The Gitea Runner tag                                                                                                                                   | `5.2.3`                        |
 | `statefulset.runner.digest`            | Image digest. Allows to pin the given image tag. Useful for having control over mutable tags like `latest`                                             | `""`                           |
 | `statefulset.runner.pullPolicy`        | The Gitea Runner pullPolicy                                                                                                                            | `IfNotPresent`                 |
 | `statefulset.runner.fullOverride`      | Completely overrides the image registry, path/image, tag and digest.                                                                                   | `""`                           |
@@ -96,11 +102,12 @@ For resource limit examples (runner vs DinD), see [docs/resources.md](./docs/res
 | `statefulset.runner.extraEnvs`         | Allows adding custom environment variables                                                                                                             | `[]`                           |
 | `statefulset.runner.flushCache`        | whether to clear the .runner (cache) file by creating an extra init container, can slightly increase boot-up time                                      | `false`                        |
 | `statefulset.runner.config`            | Gitea Runner custom configuration. See [Gitea Runner documentation](https://docs.gitea.com/usage/actions/act-runner#configuration) for details.        | `Too complex. See values.yaml` |
+| `statefulset.dind.enabled`             | Deploy the Docker-in-Docker sidecar and mount its socket in the runner. Disable for Kubernetes-only runners.                                           | `true`                         |
 | `statefulset.dind.rootless`            | a simple flag to let helm know we are dealing with a rootless dind container                                                                           | `false`                        |
 | `statefulset.dind.uid`                 | a field to set the running user id for the rootless dind container, so it knows where to look for the socket                                           | `""`                           |
 | `statefulset.dind.registry`            | image registry, e.g. gcr.io,docker.io                                                                                                                  | `docker.io`                    |
 | `statefulset.dind.repository`          | The Docker-in-Docker image                                                                                                                             | `docker`                       |
-| `statefulset.dind.tag`                 | The Docker-in-Docker image tag                                                                                                                         | `29.7.1-dind`                  |
+| `statefulset.dind.tag`                 | The Docker-in-Docker image tag                                                                                                                         | `29.9.2-dind`                  |
 | `statefulset.dind.digest`              | Image digest. Allows to pin the given image tag. Useful for having control over mutable tags like `latest`                                             | `""`                           |
 | `statefulset.dind.fullOverride`        | Completely overrides the image registry, path/image, tag and digest.                                                                                   | `""`                           |
 | `statefulset.dind.pullPolicy`          | The Docker-in-Docker pullPolicy                                                                                                                        | `IfNotPresent`                 |

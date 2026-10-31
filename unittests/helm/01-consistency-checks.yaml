@@ -33,3 +33,25 @@ tests:
     asserts:
       - failedTemplate:
           errorMessage: "giteaRootURL is required"
+  - it: requires an explicit service account when granting Kubernetes permissions
+    set:
+      enabled: true
+      serviceAccount: null
+      existingSecret: my-secret
+      existingSecretKey: token
+      giteaRootURL: https://gitea.example.com
+      rbac.create: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "rbac.create requires serviceAccount.create or statefulset.serviceAccountName"
+  - it: accepts reused legacy values without the new creation maps
+    set:
+      enabled: true
+      existingSecret: my-secret
+      existingSecretKey: token
+      giteaRootURL: https://gitea.example.com
+      serviceAccount: null
+      rbac: null
+    asserts:
+      - hasDocuments:
+          count: 0

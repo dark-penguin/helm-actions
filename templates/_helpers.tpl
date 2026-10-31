@@ -143,3 +143,11 @@ Create image for Init
 {{- define "gitea.actions.init.image" -}}
 {{ include "gitea.actions.common.image" (dict "root" . "image" .Values.init.image) }}
 {{- end -}}
+
+{{- define "gitea.actions.serviceAccountName" -}}
+{{- if (.Values.serviceAccount | default dict).create -}}
+{{- default (printf "%s-runner" (include "gitea.actions.fullname" .) | trunc 63 | trimSuffix "-") .Values.statefulset.serviceAccountName -}}
+{{- else -}}
+{{- .Values.statefulset.serviceAccountName -}}
+{{- end -}}
+{{- end -}}
