@@ -19,18 +19,19 @@ env:
   HELM_VERSION: "4.3.1"
 
 jobs:
-  generate-chart-publish:
+  publish-chart:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Install Helm
-        #uses: https://github.com/Azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5 # Gitea
         uses: Azure/setup-helm@v5 # Github / Act
         with:
           version: "${{ env.HELM_VERSION }}"
 
-      - name: Install helm-push plugin
+      - name: Install helm-push plugin (Gitea)
+        if: ${{ env.GITEA_ACTIONS == 'true' }}
         run: |
           helm plugin install --verify=false https://github.com/chartmuseum/helm-push --version 0.11.1
 
@@ -43,7 +44,8 @@ jobs:
           mkdir -p ./output
           helm package --version "$VERSION" --destination ./output ./
 
-      - name: Publish chart
+      - name: Publish chart (Gitea)
+        if: ${{ env.GITEA_ACTIONS == 'true' }}
         env:
           VERSION: ${{ inputs.version }}
         run: |
@@ -51,7 +53,20 @@ jobs:
           echo "Logging in as '${GITHUB_ACTOR}:${{ secrets.MY_PACKAGE_TOKEN }}'..."
           helm repo add gitea ${GITHUB_SERVER_URL}/api/packages/${GITHUB_REPOSITORY_OWNER}/helm \
             --username "${GITHUB_ACTOR}" \
-            --password "${{ secrets.MY_PACKAGE_TOKEN }}" && echo "Logged in" || { echo "Failed to log in"; exit 1; }
-
+            --password "${{ secrets.MY_PACKAGE_TOKEN }}" \
+            && echo "Logged in" || { echo "Failed to log in"; exit 1; }
           echo -e "\nPublishing ..."
           helm cm-push "./output/actions-${VERSION}.tgz" gitea
+
+      - name: Publish chart (Github)
+        if: ${{ env.GITEA_ACTIONS != 'true' }}
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          [[ -n "$VERSION" ]] || VERSION="${GITHUB_REF_NAME#v}"
+          echo "Logging in as '${GITHUB_ACTOR}:${{ github.token }}'..."
+          echo "${{ github.token }}" | helm registry login ghcr.io \
+            --username "${GITHUB_ACTOR}" \
+            --password-stdin \
+            && echo "Logged in" || { echo "Failed to log in"; exit 1; }
+          helm push "./output/actions-${VERSION}.tgz" "oci://ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/charts"
